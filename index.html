@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <title>신도시 토지 거래 시그니처 — LH 사태 재현 데이터 조사</title>
-<meta name="description" content="국토부 실거래가 공개시스템 데이터로 3기 신도시 발표 전 토지 매집 패턴을 정량 분석한 데이터 저널리즘 프로젝트.">
+<meta name="description" content="국토부 실거래가 공개시스템 데이터로 신도시 발표 전 토지 매집 패턴을 정량 분석한 데이터 저널리즘 프로젝트.">
 <style>
-  :root { --accent:#b71c1c; --accent2:#0a5; --muted:#666; --line:#e3e3e3; }
+  :root { --accent:#b71c1c; --accent2:#0a5; --accent3:#1565c0; --accent4:#8e44ad; --muted:#666; --line:#e3e3e3; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
-         max-width: 980px; margin: 32px auto; padding: 0 18px; color:#1a1a1a; background:#fafafa; line-height:1.6; }
+         max-width: 1080px; margin: 32px auto; padding: 0 18px; color:#1a1a1a; background:#fafafa; line-height:1.6; }
   a { color:#0451a5; text-decoration:none; }
   a:hover { text-decoration:underline; }
   h1 { font-size:26px; margin:0 0 4px; letter-spacing:-0.2px; }
@@ -18,17 +18,26 @@
   .hero p { margin:0; color:#222; font-size:14px; }
 
   .cards { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:16px; }
-  .card { background:#fff; border:1px solid var(--line); border-radius:8px; padding:18px 20px; }
+  @media (max-width: 720px) { .cards { grid-template-columns: 1fr; } }
+  .card { background:#fff; border:1px solid var(--line); border-radius:8px; padding:18px 20px; display:flex; flex-direction:column; }
   .card .tag { font-size:11px; letter-spacing:0.6px; color:var(--muted); text-transform:uppercase; }
-  .card h3 { margin:6px 0 8px; font-size:17px; }
+  .card h3 { margin:6px 0 8px; font-size:16px; }
   .card .meta { font-size:12px; color:var(--muted); margin-bottom:10px; }
   .card .kpi { display:grid; grid-template-columns:repeat(2,1fr); gap:6px; margin:10px 0; }
   .card .kpi div { background:#f7f7f7; border-radius:4px; padding:8px 10px; font-size:12px; }
   .card .kpi b { display:block; font-size:18px; color:var(--accent); }
-  .card .finding { font-size:13px; color:#222; border-top:1px solid #eee; padding-top:10px; margin-top:10px; }
-  .card .cta { display:inline-block; margin-top:12px; background:var(--accent); color:#fff; padding:6px 10px; border-radius:4px; font-size:12px; }
+  .card .finding { font-size:13px; color:#222; border-top:1px solid #eee; padding-top:10px; margin-top:10px; flex:1; }
+  .card .cta { display:inline-block; margin-top:12px; background:var(--accent); color:#fff; padding:6px 10px; border-radius:4px; font-size:12px; align-self:flex-start; }
   .card.green .kpi b { color:var(--accent2); }
   .card.green .cta { background:var(--accent2); }
+  .card.blue .kpi b { color:var(--accent3); }
+  .card.blue .cta { background:var(--accent3); }
+  .card.purple .kpi b { color:var(--accent4); }
+  .card.purple .cta { background:var(--accent4); }
+  .card .verdict { display:inline-block; padding:2px 7px; border-radius:3px; font-size:11px; font-weight:600; }
+  .card .verdict.hit { background:#fee; color:#a00; }
+  .card .verdict.weak { background:#fef0e0; color:#a55; }
+  .card .verdict.null { background:#eaf2fb; color:#1565c0; }
 
   table { width:100%; border-collapse:collapse; font-size:13px; background:#fff; }
   th, td { border-bottom:1px solid #eee; padding:7px 10px; text-align:left; }
@@ -45,14 +54,14 @@
 <body>
 
 <h1>신도시 토지 거래 시그니처</h1>
-<div class="sub">3기 신도시 발표 전 토지 매집 패턴 정량 분석 · 국토부 실거래가 공개시스템 데이터 기반</div>
+<div class="sub">신도시 발표 전 토지 매집 패턴 정량 분석 · 국토부 실거래가 공개시스템 데이터 기반</div>
 
 <div class="hero">
   <h3>왜 만드는가</h3>
   <p>
   2021년 LH 사태 때 직원 13명이 광명·시흥 후보지를 매입한 정황은 같은 데이터(국토부 실거래가)에서 잡혔다.
   같은 코드를 자동화해 다른 신도시·후보지에 돌리면 "발표 전 매집"이 잡히는지 검증할 수 있다.
-  이 사이트는 그 검증 결과를 지구별로 공개한다.
+  이 사이트는 그 검증 결과를 지구별로 공개한다. 가설이 부정되는 케이스도 그대로 싣는다.
   </p>
 </div>
 
@@ -60,9 +69,9 @@
 <div class="cards">
 
   <div class="card">
-    <div class="tag">검증 1 (PoC)</div>
+    <div class="tag">PoC · 2021년</div>
     <h3>광명·시흥 신도시</h3>
-    <div class="meta">발표 2021-02-24 · 지구지정 2022-11-29 · 토지 거래 24,765건 (2018–2024)</div>
+    <div class="meta">발표 2021-02-24 · 토지 거래 24,765건 (2018–2024) · <span class="verdict hit">시그니처 강함</span></div>
     <div class="kpi">
       <div><b>×1.65</b>지구 폭증 배율</div>
       <div><b>×1.02</b>통제군 배율</div>
@@ -70,25 +79,57 @@
       <div><b>10%</b>발표 후 잔존율</div>
     </div>
     <div class="finding">
-      <strong>강한 시그니처.</strong> 발표 8~12개월 전 지구 7개 동에서 거래 65% 폭증. 통제군은 변화 없음(거시 요인 아님). 같은 임야 필지에 17~26명이 같은 날 1/n 지분 매수한 클러스터 줄줄이. 한 번지에 6개월간 133건 누적. 2021 LH 사태 시그니처 그대로 재현.
+      발표 8~12개월 전 지구 7개 동에서 거래 65% 폭증. 같은 임야 필지에 17~26명이 같은 날 1/n 지분 매수한 클러스터 다수. 한 번지에 6개월간 133건 누적. 2021 LH 사태 시그니처 그대로 재현.
     </div>
     <a class="cta" href="pages/gwangmyeong-siheung.html">상세 데이터·차트 →</a>
   </div>
 
   <div class="card green">
-    <div class="tag">검증 2</div>
+    <div class="tag">2021년 · 4차</div>
     <h3>의왕·군포·안산 + 화성진안</h3>
-    <div class="meta">발표 2021-08-30 · 지구지정 2023-06-30 / 2024-02-07 · 토지 거래 13,624건 (2018–2024)</div>
+    <div class="meta">발표 2021-08-30 · 토지 거래 13,624건 · <span class="verdict weak">시그니처 약함</span></div>
     <div class="kpi">
-      <div><b>×1.06</b>지구 폭증 배율</div>
+      <div><b>×1.06</b>지구 배율</div>
       <div><b>×0.65</b>통제군 배율</div>
-      <div><b>×1.63</b>지구-통제 격차</div>
-      <div><b>31%</b>발표 후 잔존율</div>
+      <div><b>×1.63</b>격차</div>
+      <div><b>31%</b>발표 후 잔존</div>
     </div>
     <div class="finding">
-      <strong>약한·변형 시그니처.</strong> 광명·시흥 사태 6개월 후 발표. 격차 배율(×1.63)은 비슷하나 메커니즘이 다름 — 광명·시흥은 지구가 폭증했고, 여기는 시장 둔화 속 지구만 거래 유지. 의왕 초평동 4** 번지 85건, 화성 기산동 1** 번지 29건 동일자 클러스터. 단속 후에도 매집이 잔존한 신호.
+      격차 배율은 비슷하지만 메커니즘이 다름 — 시장 둔화 속 지구만 거래 유지. LH 사태 단속에도 일부 매집 잔존 신호. 의왕 초평동 4** 번지 85건 누적.
     </div>
     <a class="cta" href="pages/uiwang-gunpo-ansan.html">상세 데이터·차트 →</a>
+  </div>
+
+  <div class="card blue">
+    <div class="tag">2018년 · 1차</div>
+    <h3>1차 3기 신도시</h3>
+    <div class="meta">발표 2018-12-19 · 토지 거래 70,687건 · <span class="verdict null">가설 부정</span></div>
+    <div class="kpi">
+      <div><b>×0.98</b>지구 배율</div>
+      <div><b>×1.09</b>통제군 배율</div>
+      <div><b>×0.90</b>격차</div>
+      <div><b>90%</b>발표 후 잔존</div>
+    </div>
+    <div class="finding">
+      남양주왕숙·하남교산·인천계양 모두 격차 ×1.0 미만. 광명·시흥 시그니처가 자동 재현되지 않음. 계양은 통제군이 ×2.47 폭증 — 인접 분산 매집 가능성. 광명·시흥의 특이성을 강화하는 결과.
+    </div>
+    <a class="cta" href="pages/1st-batch-3rd-gen.html">상세 데이터·차트 →</a>
+  </div>
+
+  <div class="card purple">
+    <div class="tag">2024년 · 가장 최근</div>
+    <h3>2024 신규택지 4곳</h3>
+    <div class="meta">발표 2024-11-05 · 토지 거래 13,080건 · <span class="verdict weak">미세 신호</span></div>
+    <div class="kpi">
+      <div><b>×0.70</b>지구 배율</div>
+      <div><b>×0.80</b>통제군 배율</div>
+      <div><b>×0.87</b>격차</div>
+      <div><b>53%</b>발표 후 2개월</div>
+    </div>
+    <div class="finding">
+      서리풀·고양대곡·오전왕곡·의정부용현. 광명·시흥 시그니처 자동 재현 안 됨. <strong>의왕 오전왕곡만 격차 ×1.54로 상대적 강신호</strong>. 단 오전동 66건 클러스터는 지분 0% — 단일 보유 필지 분할 매도로 추정. 등기부 확인 필요한 유일한 케이스.
+    </div>
+    <a class="cta" href="pages/2024-candidates.html">상세 데이터·차트 →</a>
   </div>
 
 </div>
@@ -96,7 +137,7 @@
 <h2>한눈에 보는 비교</h2>
 <table>
   <thead>
-    <tr><th>지구</th><th>발표일</th><th class="num">지구 배율</th><th class="num">통제군 배율</th><th class="num">격차</th><th class="num">발표 후 잔존</th><th>최대 클러스터</th><th>최대 번지 누적</th></tr>
+    <tr><th>지구</th><th>발표일</th><th class="num">지구 배율</th><th class="num">통제군 배율</th><th class="num">격차</th><th>판정</th><th>핵심 시그너처</th></tr>
   </thead>
   <tbody>
     <tr>
@@ -105,9 +146,8 @@
       <td class="num">×1.65</td>
       <td class="num">×1.02</td>
       <td class="num">×1.62</td>
-      <td class="num">10%</td>
-      <td>과림동 2020-05-06: 26건<br><span style="color:#666;font-size:11px;">한 임야 필지 25건 지분</span></td>
-      <td>과림동 산7*: 133건 / 6개월</td>
+      <td><span class="verdict hit">시그니처 강함</span></td>
+      <td>한 임야 필지에 26명 동일자 지분 분할 매수</td>
     </tr>
     <tr>
       <td><a href="pages/uiwang-gunpo-ansan.html">의왕·군포·안산 + 화성진안</a></td>
@@ -115,9 +155,26 @@
       <td class="num">×1.06</td>
       <td class="num">×0.65</td>
       <td class="num">×1.63</td>
-      <td class="num">31%</td>
-      <td>기산동 2020-10-30: 29건<br><span style="color:#666;font-size:11px;">한 번지 18건 (지분 0%)</span></td>
-      <td>초평동 4**: 85건 / 12개월</td>
+      <td><span class="verdict weak">시그니처 약함</span></td>
+      <td>시장 둔화 속 지구만 거래 유지 (잔존 신호)</td>
+    </tr>
+    <tr>
+      <td><a href="pages/1st-batch-3rd-gen.html">1차 3기 신도시</a></td>
+      <td>2018-12-19</td>
+      <td class="num">×0.98</td>
+      <td class="num">×1.09</td>
+      <td class="num">×0.90</td>
+      <td><span class="verdict null">가설 부정</span></td>
+      <td>지구가 통제군보다 덜 증가, 인접 분산 가설 단서</td>
+    </tr>
+    <tr>
+      <td><a href="pages/2024-candidates.html">2024 신규택지 4곳</a></td>
+      <td>2024-11-05</td>
+      <td class="num">×0.70</td>
+      <td class="num">×0.80</td>
+      <td class="num">×0.87</td>
+      <td><span class="verdict weak">미세 신호 (의왕만 ×1.54)</span></td>
+      <td>4곳 중 의왕만 약신호. 오전동 66건 클러스터 지분 0%</td>
     </tr>
   </tbody>
 </table>
@@ -126,7 +183,7 @@
 <div class="method">
   <ol>
     <li><strong>지구·동 정의</strong>: 각 신도시 지정 고시에서 포함된 법정동을 확보. 같은 시·구 내 비지정 법정동을 통제군으로 사용.</li>
-    <li><strong>데이터 수집</strong>: 국토부 실거래가 공개시스템(<code>rt.molit.go.kr</code>)에서 시군구별·연도별 토지 매매 거래 CSV를 일괄 다운로드. 발표일 기준 24~30개월 전후 구간.</li>
+    <li><strong>데이터 수집</strong>: 국토부 실거래가 공개시스템(<code>rt.molit.go.kr</code>)에서 시군구별·연도별 토지 매매 CSV를 일괄 다운로드. 발표일 기준 24~36개월 전후 구간.</li>
     <li><strong>정규화</strong>: EUC-KR → UTF-8 변환, 안내 헤더 스킵, 시군구·법정동·번지(마스킹)·지목·면적·금액·지분구분·계약일자 추출.</li>
     <li><strong>시그니처 탐지</strong>:
       <ul style="margin-top:6px">
@@ -143,14 +200,28 @@
   </p>
 </div>
 
+<h2>다음 검증 후보</h2>
+<div class="method">
+  <ul style="padding-left:18px">
+    <li><strong>2차 3기 신도시</strong> (2019-05-07 발표) — 고양창릉·부천대장. 1차와 광명·시흥 사이.</li>
+    <li><strong>2024-11-05 발표 신규 후보지</strong> — 서리풀(서울)·고양대곡·의왕오전왕곡·의정부용현. 가장 최근 사례. LH 사태 이후 발표분에서 시그니처가 약해졌는지(=시스템 자정) 검증.</li>
+    <li><strong>2기 신도시 잔여 추가지구</strong> — 2020-05-06 발표분.</li>
+    <li><strong>광명·시흥 단지 단위 심화</strong> — 매수자 등기부 추적 (정보공개·등기부등본).</li>
+  </ul>
+</div>
+
 <h2>데이터·코드</h2>
 <table>
   <tbody>
-    <tr><td>수집 스크립트 (광명·시흥)</td><td><code>parse.py</code></td></tr>
-    <tr><td>수집 스크립트 (의왕·군포·안산)</td><td><code>parse_ugas.py</code></td></tr>
+    <tr><td>광명·시흥 파서</td><td><code>parse.py</code></td></tr>
+    <tr><td>의왕·군포·안산 파서</td><td><code>parse_ugas.py</code></td></tr>
+    <tr><td>1차 3기 신도시 파서</td><td><code>parse_1cha.py</code></td></tr>
+    <tr><td>2024 후보지 파서</td><td><code>parse_2024.py</code></td></tr>
     <tr><td>광명·시흥 통합 CSV</td><td><code>data/parsed/land_all.csv</code> (24,765건)</td></tr>
     <tr><td>의왕·군포·안산 통합 CSV</td><td><code>data/parsed/land_all_ugas.csv</code> (13,624건)</td></tr>
-    <tr><td>차트용 집계</td><td><code>viz_data.json</code> / <code>viz_data_ugas.json</code></td></tr>
+    <tr><td>1차 3기 통합 CSV</td><td><code>data/parsed/land_all_1cha.csv</code> (70,687건)</td></tr>
+    <tr><td>2024 후보지 통합 CSV</td><td><code>data/parsed/land_all_2024.csv</code> (13,080건)</td></tr>
+    <tr><td>차트용 집계</td><td><code>viz_data*.json</code></td></tr>
   </tbody>
 </table>
 
