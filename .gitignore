@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# 작업 임시
+/tmp/
+*.tmp
+*.log
+
+# 큰 중간 산출물(필요 시 주석 해제)
+# data/raw/
+# data/raw_ugas/
