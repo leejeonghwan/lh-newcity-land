@@ -5,7 +5,7 @@
 <title>신도시 토지 거래 시그니처 — LH 사태 재현 데이터 조사</title>
 <meta name="description" content="국토부 실거래가 공개시스템 데이터로 신도시 발표 전 토지 매집 패턴을 정량 분석한 데이터 저널리즘 프로젝트.">
 <style>
-  :root { --accent:#b71c1c; --accent2:#0a5; --accent3:#1565c0; --accent4:#8e44ad; --muted:#666; --line:#e3e3e3; }
+  :root { --accent:#b71c1c; --accent2:#0a5; --accent3:#1565c0; --accent4:#8e44ad; --accent5:#e67e22; --muted:#666; --line:#e3e3e3; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
          max-width: 1080px; margin: 32px auto; padding: 0 18px; color:#1a1a1a; background:#fafafa; line-height:1.6; }
   a { color:#0451a5; text-decoration:none; }
@@ -34,6 +34,8 @@
   .card.blue .cta { background:var(--accent3); }
   .card.purple .kpi b { color:var(--accent4); }
   .card.purple .cta { background:var(--accent4); }
+  .card.orange .kpi b { color:var(--accent5); }
+  .card.orange .cta { background:var(--accent5); }
   .card .verdict { display:inline-block; padding:2px 7px; border-radius:3px; font-size:11px; font-weight:600; }
   .card .verdict.hit { background:#fee; color:#a00; }
   .card .verdict.weak { background:#fef0e0; color:#a55; }
@@ -116,6 +118,22 @@
     <a class="cta" href="pages/1st-batch-3rd-gen.html">상세 데이터·차트 →</a>
   </div>
 
+  <div class="card orange">
+    <div class="tag">2019년 · 2차</div>
+    <h3>2차 3기 신도시</h3>
+    <div class="meta">발표 2019-05-07 · 토지 거래 12,347건 · <span class="verdict weak">가설 부정 + 부분 신호</span></div>
+    <div class="kpi">
+      <div><b>×0.68</b>지구 배율</div>
+      <div><b>×0.81</b>통제군 배율</div>
+      <div><b>×0.85</b>격차</div>
+      <div><b>42%</b>발표 후 잔존</div>
+    </div>
+    <div class="finding">
+      고양창릉·부천대장. 전체 격차는 가설 부정. 그러나 <strong>고양 행신동 2019-01-18 클러스터 7건 지분 100%(대·전)</strong> — 광명·시흥 시그니처 그대로. 행신동 ×2.0 폭증. 등기부 추적 후보.
+    </div>
+    <a class="cta" href="pages/2nd-batch-3rd-gen.html">상세 데이터·차트 →</a>
+  </div>
+
   <div class="card purple">
     <div class="tag">2024년 · 가장 최근</div>
     <h3>2024 신규택지 4곳</h3>
@@ -168,6 +186,15 @@
       <td>지구가 통제군보다 덜 증가, 인접 분산 가설 단서</td>
     </tr>
     <tr>
+      <td><a href="pages/2nd-batch-3rd-gen.html">2차 3기 신도시</a></td>
+      <td>2019-05-07</td>
+      <td class="num">×0.68</td>
+      <td class="num">×0.81</td>
+      <td class="num">×0.85</td>
+      <td><span class="verdict weak">가설 부정 + 부분 신호</span></td>
+      <td>고양 행신동 2019-01-18 지분 100% 7건</td>
+    </tr>
+    <tr>
       <td><a href="pages/2024-candidates.html">2024 신규택지 4곳</a></td>
       <td>2024-11-05</td>
       <td class="num">×0.70</td>
@@ -216,10 +243,12 @@
     <tr><td>광명·시흥 파서</td><td><code>parse.py</code></td></tr>
     <tr><td>의왕·군포·안산 파서</td><td><code>parse_ugas.py</code></td></tr>
     <tr><td>1차 3기 신도시 파서</td><td><code>parse_1cha.py</code></td></tr>
+    <tr><td>2차 3기 신도시 파서</td><td><code>parse_2cha.py</code></td></tr>
     <tr><td>2024 후보지 파서</td><td><code>parse_2024.py</code></td></tr>
     <tr><td>광명·시흥 통합 CSV</td><td><code>data/parsed/land_all.csv</code> (24,765건)</td></tr>
     <tr><td>의왕·군포·안산 통합 CSV</td><td><code>data/parsed/land_all_ugas.csv</code> (13,624건)</td></tr>
     <tr><td>1차 3기 통합 CSV</td><td><code>data/parsed/land_all_1cha.csv</code> (70,687건)</td></tr>
+    <tr><td>2차 3기 통합 CSV</td><td><code>data/parsed/land_all_2cha.csv</code> (12,347건)</td></tr>
     <tr><td>2024 후보지 통합 CSV</td><td><code>data/parsed/land_all_2024.csv</code> (13,080건)</td></tr>
     <tr><td>차트용 집계</td><td><code>viz_data*.json</code></td></tr>
   </tbody>

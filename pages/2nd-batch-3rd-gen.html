@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>2차 3기 신도시 — 토지 거래 시계열</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+         max-width: 1200px; margin: 24px auto; padding: 0 16px; color: #1a1a1a; background:#fafafa; }
+  a { color:#e67e22; text-decoration:none; }
+  a:hover { text-decoration:underline; }
+  h1 { font-size: 22px; margin-bottom: 4px; }
+  h2 { font-size: 17px; margin-top: 36px; border-left: 3px solid #e67e22; padding-left: 8px; }
+  .sub { color:#666; font-size:13px; margin-bottom: 24px; }
+  .crumbs { font-size:12px; color:#888; margin-bottom:12px; }
+  .crumbs a { color:#0451a5; }
+  .kpi-row { display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; margin: 16px 0 24px; }
+  .kpi { background:#fff; border:1px solid #e3e3e3; border-radius:6px; padding:12px 14px; }
+  .kpi .v { font-size: 22px; font-weight: 700; color:#e67e22; }
+  .kpi .l { font-size: 12px; color:#666; margin-top:2px; }
+  .chart-wrap { background:#fff; border:1px solid #e3e3e3; border-radius:6px; padding:16px; margin:12px 0; }
+  .chart-wrap h3 { font-size:14px; margin:0 0 8px; color:#333; }
+  .small-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; }
+  table { width:100%; border-collapse: collapse; font-size:13px; background:#fff; }
+  th, td { border-bottom: 1px solid #eee; padding:6px 8px; text-align:left; }
+  th { background:#f3f3f3; }
+  td.num { text-align:right; font-variant-numeric: tabular-nums; }
+  .note { font-size:12px; color:#666; margin-top:6px; line-height:1.5; }
+  .pill { display:inline-block; background:#fdf3e8; color:#a55; border-radius:3px; padding:1px 6px; font-size:11px; margin-left:4px; }
+  .pill.hot { background:#fee; color:#a00; }
+  .pill.med { background:#fef0e0; color:#a55; }
+  .pill.muted { background:#eee; color:#666; }
+  .ctx { background:#fff8e6; border:1px solid #f5e4a8; border-radius:6px; padding:12px 14px; font-size:13px; line-height:1.6; }
+  .ctx.cool { background:#f0f7ff; border-color:#a8c4e4; }
+  .highlight { background:#fff; border-left:4px solid #e67e22; padding:10px 14px; margin:14px 0; font-size:13px; line-height:1.7; }
+</style>
+</head>
+<body>
+
+<div class="crumbs"><a href="../index.html">← 메인</a></div>
+<h1>2차 3기 신도시 (2019-05-07 발표) — 토지 거래 시계열</h1>
+<div class="sub">고양창릉 · 부천대장 — 국토부 실거래가 12,347건 (2016-2020)</div>
+
+<div class="ctx">
+  <strong>맥락:</strong> 2019년 5월 7일 정부가 2차 3기 신도시(고양창릉·부천대장)를 발표했다. 1차(2018-12) 5개월 후, 광명·시흥(2021-02) 21개월 전. 시기적으로 두 사이의 가교.
+</div>
+
+<div class="highlight">
+  <strong>주목할 신호 — 고양 행신동 2019-01-18:</strong> 7건이 한 날에 매수됐는데 <strong>지분 비율 100%</strong>, 지목 대 4·전 3.
+  광명·시흥의 "임야 + 지분 100%"와 형태가 같은 패턴. 발표 약 4개월 전.
+  행신동 자체도 평년 대비 ×2.0 폭증 — 동별 최대.
+</div>
+
+<h2>핵심 숫자</h2>
+<div class="kpi-row">
+  <div class="kpi"><div class="v" id="kpi1">—</div><div class="l">지구 11개 동, 발표 12개월전/평년 배율</div></div>
+  <div class="kpi"><div class="v" id="kpi2">—</div><div class="l">통제군, 같은 기간 배율</div></div>
+  <div class="kpi"><div class="v" id="kpi3">—</div><div class="l">지구-통제 격차 (광명·시흥 ×1.62)</div></div>
+  <div class="kpi"><div class="v" id="kpi4">—</div><div class="l">발표 후 잔존율 (2019.5 ~ 2020.12 / 평년)</div></div>
+</div>
+
+<h2>지구별 격차</h2>
+<div class="chart-wrap">
+  <h3>둘 다 격차 ×1.0 미만. 그러나 동별 클러스터에 강신호</h3>
+  <table>
+    <thead><tr><th>지구</th><th>시군구</th><th class="num">지구 평년</th><th class="num">지구 12m전</th><th class="num">지구 배율</th><th class="num">통제 배율</th><th class="num">격차</th></tr></thead>
+    <tbody id="districtTable"></tbody>
+  </table>
+</div>
+
+<h2>월별 거래 — 지구 vs 시군구 통제군</h2>
+<div class="chart-wrap">
+  <canvas id="mainChart" height="120"></canvas>
+  <div class="note">주황 세로선: 발표일(2019-05-07). 회색 음영: 가설 검증 구간(2018-05 ~ 2019-04).</div>
+</div>
+
+<h2>지구 11개 동 — 동별 시계열</h2>
+<div class="small-grid" id="dongGrid"></div>
+
+<h2>같은 동·같은 날 클러스터</h2>
+<div class="chart-wrap">
+  <h3>행신동 2019-01-18 7건은 지분 100% — 광명·시흥 시그니처 그대로</h3>
+  <table id="clusterTable">
+    <thead><tr><th>시군구</th><th>동</th><th>일자</th><th class="num">건수</th><th>최다 번지</th><th class="num">그 번지</th><th class="num">지분</th><th>지목</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <div class="note">광명·시흥 시그니처는 임야 + 지분 100%였음. 행신동·도내동·동산동의 지분 50% 이상 클러스터가 가장 강한 단서.</div>
+</div>
+
+<h2>번지별 매집 집중도 (발표 12개월 전)</h2>
+<div class="chart-wrap">
+  <table id="bunjiTable">
+    <thead><tr><th>시군구</th><th>동</th><th>번지</th><th class="num">12개월 거래</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<h2>해석 — 정직한 메모</h2>
+<div class="ctx cool">
+  <p style="margin-top:0">전체 격차(×0.85)는 광명·시흥에 못 미친다. 부동산 시장 둔화기와 겹친다. 그러나 <strong>고양 행신동 2019-01-18 클러스터는 무시할 수 없는 신호</strong>: 7건 모두 지분, 대지·전 위주, 발표 4개월 전.</p>
+  <p>가능한 해석:</p>
+  <ul style="margin:6px 0 6px 18px; padding:0">
+    <li>1차 3기(2018-12) 발표 직후의 후폭풍으로 광명·시흥 같은 노골적 매집이 잡히지 않을 수도. 단속 강화기.</li>
+    <li>또는 매집은 있었지만 지구 인접 지역으로 분산됐을 가능성. 행신동 같은 작은 동의 100% 지분 클러스터가 일부 매집의 증거.</li>
+    <li>1차 3기·2차 3기 모두 가설 부정에 가까운 결과는, 광명·시흥(2021-02) 발표가 데이터로 진짜 예외적이었음을 강화.</li>
+  </ul>
+  <p style="margin-bottom:0"><strong>등기부 추적 후보:</strong> 고양 행신동 2019-01-18 7건 매수자.</p>
+</div>
+
+<script id="vizdata" type="application/json">{
+  "main": {
+    "labels": [
+      "2016-01",
+      "2016-02",
+      "2016-03",
+      "2016-04",
+      "2016-05",
+      "2016-06",
+      "2016-07",
+      "2016-08",
+      "2016-09",
+      "2016-10",
+      "2016-11",
+      "2016-12",
+      "2017-01",
+      "2017-02",
+      "2017-03",
+      "2017-04",
+      "2017-05",
+      "2017-06",
+      "2017-07",
+      "2017-08",
+      "2017-09",
+      "2017-10",
+      "2017-11",
+      "2017-12",
+      "2018-01",
+      "2018-02",
+      "2018-03",
+      "2018-04",
+      "2018-05",
+      "2018-06",
+      "2018-07",
+      "2018-08",
+      "2018-09",
+      "2018-10",
+      "2018-11",
+      "2018-12",
+      "2019-01",
+      "2019-02",
+      "2019-03",
+      "2019-04",
+      "2019-05",
+      "2019-06",
+      "2019-07",
+      "2019-08",
+      "2019-09",
+      "2019-10",
+      "2019-11",
+      "2019-12",
+      "2020-01",
+      "2020-02",
+      "2020-03",
+      "2020-04",
+      "2020-05",
+      "2020-06",
+      "2020-07",
+      "2020-08",
+      "2020-09",
+      "2020-10",
+      "2020-11",
+      "2020-12"
+    ],
+    "treatment": [
+      47,
+      43,
+      48,
+      57,
+      88,
+      118,
+      102,
+      85,
+      57,
+      89,
+      91,
+      87,
+      47,
+      73,
+      75,
+      47,
+      59,
+      64,
+      65,
+      46,
+      56,
+      46,
+      70,
+      61,
+      57,
+      25,
+      57,
+      97,
+      108,
+      67,
+      41,
+      38,
+      46,
+      65,
+      33,
+      33,
+      32,
+      16,
+      47,
+      29,
+      37,
+      19,
+      29,
+      15,
+      26,
+      14,
+      23,
+      13,
+      22,
+      21,
+      34,
+      16,
+      24,
+      99,
+      41,
+      23,
+      22,
+      24,
+      26,
+      44
+    ],
+    "control": [
+      167,
+      96,
+      185,
+      144,
+      161,
+      140,
+      163,
+      170,
+      122,
+      232,
+      131,
+      176,
+      145,
+      94,
+      126,
+      130,
+      147,
+      128,
+      159,
+      182,
+      137,
+      85,
+      177,
+      129,
+      103,
+      149,
+      127,
+      106,
+      119,
+      144,
+      111,
+      127,
+      117,
+      122,
+      148,
+      136,
+      85,
+      126,
+      109,
+      84,
+      136,
+      142,
+      141,
+      88,
+      224,
+      192,
+      177,
+      194,
+      106,
+      136,
+      172,
+      173,
+      301,
+      344,
+      278,
+      238,
+      140,
+      162,
+      221,
+      359
+    ],
+    "ratio": [
+      22.0,
+      30.9,
+      20.6,
+      28.4,
+      35.3,
+      45.7,
+      38.5,
+      33.3,
+      31.8,
+      27.7,
+      41.0,
+      33.1,
+      24.5,
+      43.7,
+      37.3,
+      26.6,
+      28.6,
+      33.3,
+      29.0,
+      20.2,
+      29.0,
+      35.1,
+      28.3,
+      32.1,
+      35.6,
+      14.4,
+      31.0,
+      47.8,
+      47.6,
+      31.8,
+      27.0,
+      23.0,
+      28.2,
+      34.8,
+      18.2,
+      19.5,
+      27.4,
+      11.3,
+      30.1,
+      25.7,
+      21.4,
+      11.8,
+      17.1,
+      14.6,
+      10.4,
+      6.8,
+      11.5,
+      6.3,
+      17.2,
+      13.4,
+      16.5,
+      8.5,
+      7.4,
+      22.3,
+      12.9,
+      8.8,
+      13.6,
+      12.9,
+      10.5,
+      10.9
+    ]
+  },
+  "by_dong": {
+    "삼정동 (부천시 오정구)": [
+      0,
+      1,
+      5,
+      5,
+      2,
+      6,
+      0,
+      0,
+      1,
+      12,
+      16,
+      1,
+      4,
+      1,
+      3,
+      3,
+      2,
+      5,
+      6,
+      3,
+      1,
+      2,
+      13,
+      1,
+      2,
+      2,
+      4,
+      1,
+      1,
+      2,
+      1,
+      2,
+      0,
+      1,
+      0,
+      3,
+      0,
+      0,
+      1,
+      1,
+      8,
+      1,
+      2,
+      3,
+      1,
+      0,
+      2,
+      1,
+      0,
+      4,
+      5,
+      8,
+      3,
+      4,
+      2,
+      8,
+      0,
+      6,
+      4,
+      17
+    ],
+    "원종동 (부천시 오정구)": [
+      3,
+      3,
+      1,
+      1,
+      2,
+      2,
+      2,
+      5,
+      2,
+      3,
+      3,
+      3,
+      1,
+      2,
+      8,
+      3,
+      5,
+      2,
+      4,
+      0,
+      2,
+      3,
+      2,
+      0,
+      2,
+      0,
+      13,
+      3,
+      7,
+      1,
+      2,
+      1,
+      8,
+      1,
+      1,
+      2,
+      0,
+      0,
+      0,
+      2,
+      3,
+      2,
+      5,
+      0,
+      2,
+      1,
+      4,
+      1,
+      4,
+      2,
+      2,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      2,
+      3,
+      4
+    ],
+    "대장동 (부천시 오정구)": [
+      7,
+      3,
+      6,
+      13,
+      10,
+      9,
+      7,
+      2,
+      3,
+      3,
+      6,
+      3,
+      5,
+      7,
+      10,
+      7,
+      5,
+      11,
+      12,
+      13,
+      8,
+      5,
+      8,
+      13,
+      4,
+      1,
+      10,
+      4,
+      4,
+      6,
+      6,
+      4,
+      4,
+      5,
+      5,
+      5,
+      3,
+      0,
+      8,
+      6,
+      4,
+      4,
+      1,
+      1,
+      3,
+      0,
+      3,
+      0,
+      0,
+      0,
+      2,
+      1,
+      0,
+      0,
+      0,
+      0,
+      4,
+      2,
+      0,
+      2
+    ],
+    "오정동 (부천시 오정구)": [
+      3,
+      1,
+      4,
+      2,
+      1,
+      2,
+      2,
+      1,
+      3,
+      1,
+      3,
+      6,
+      0,
+      3,
+      2,
+      3,
+      4,
+      5,
+      8,
+      3,
+      1,
+      0,
+      2,
+      0,
+      6,
+      1,
+      1,
+      2,
+      0,
+      1,
+      1,
+      2,
+      0,
+      5,
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      2,
+      0,
+      3,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0
+    ],
+    "화전동 (고양시 덕양구)": [
+      4,
+      6,
+      6,
+      8,
+      6,
+      11,
+      3,
+      13,
+      5,
+      11,
+      3,
+      13,
+      1,
+      10,
+      7,
+      8,
+      4,
+      7,
+      5,
+      1,
+      15,
+      7,
+      4,
+      7,
+      3,
+      2,
+      3,
+      28,
+      42,
+      10,
+      6,
+      5,
+      7,
+      12,
+      7,
+      5,
+      3,
+      6,
+      3,
+      7,
+      12,
+      0,
+      5,
+      2,
+      1,
+      5,
+      5,
+      0,
+      5,
+      0,
+      5,
+      0,
+      6,
+      0,
+      5,
+      2,
+      1,
+      2,
+      3,
+      0
+    ],
+    "원흥동 (고양시 덕양구)": [
+      5,
+      4,
+      3,
+      5,
+      8,
+      7,
+      1,
+      7,
+      2,
+      4,
+      3,
+      6,
+      0,
+      4,
+      2,
+      2,
+      3,
+      5,
+      4,
+      2,
+      6,
+      3,
+      3,
+      2,
+      3,
+      6,
+      0,
+      6,
+      0,
+      4,
+      3,
+      0,
+      0,
+      2,
+      0,
+      2,
+      3,
+      3,
+      0,
+      0,
+      0,
+      7,
+      1,
+      2,
+      2,
+      1,
+      3,
+      1,
+      1,
+      0,
+      3,
+      0,
+      3,
+      89,
+      22,
+      0,
+      2,
+      0,
+      4,
+      8
+    ],
+    "용두동 (고양시 덕양구)": [
+      12,
+      10,
+      6,
+      10,
+      27,
+      45,
+      82,
+      52,
+      23,
+      39,
+      43,
+      34,
+      19,
+      34,
+      25,
+      12,
+      29,
+      13,
+      14,
+      13,
+      8,
+      4,
+      11,
+      8,
+      8,
+      8,
+      16,
+      16,
+      20,
+      18,
+      9,
+      11,
+      9,
+      14,
+      8,
+      4,
+      6,
+      1,
+      13,
+      8,
+      4,
+      2,
+      7,
+      4,
+      5,
+      3,
+      3,
+      6,
+      8,
+      11,
+      8,
+      2,
+      3,
+      2,
+      6,
+      3,
+      7,
+      1,
+      6,
+      1
+    ],
+    "도내동 (고양시 덕양구)": [
+      6,
+      12,
+      3,
+      3,
+      4,
+      7,
+      0,
+      5,
+      6,
+      5,
+      8,
+      17,
+      7,
+      6,
+      7,
+      5,
+      2,
+      6,
+      8,
+      7,
+      6,
+      5,
+      4,
+      11,
+      8,
+      0,
+      3,
+      1,
+      6,
+      3,
+      2,
+      2,
+      3,
+      15,
+      2,
+      5,
+      0,
+      1,
+      10,
+      3,
+      2,
+      0,
+      0,
+      1,
+      0,
+      4,
+      0,
+      1,
+      0,
+      1,
+      1,
+      1,
+      2,
+      2,
+      0,
+      2,
+      1,
+      1,
+      1,
+      5
+    ],
+    "동산동 (고양시 덕양구)": [
+      4,
+      0,
+      13,
+      8,
+      5,
+      11,
+      1,
+      0,
+      8,
+      7,
+      5,
+      4,
+      4,
+      1,
+      10,
+      4,
+      1,
+      1,
+      4,
+      3,
+      0,
+      5,
+      7,
+      6,
+      5,
+      1,
+      4,
+      6,
+      11,
+      5,
+      3,
+      6,
+      12,
+      4,
+      6,
+      1,
+      5,
+      3,
+      6,
+      0,
+      1,
+      0,
+      5,
+      2,
+      4,
+      0,
+      0,
+      1,
+      1,
+      2,
+      4,
+      0,
+      6,
+      0,
+      1,
+      0,
+      2,
+      2,
+      1,
+      1
+    ],
+    "향동동 (고양시 덕양구)": [
+      1,
+      1,
+      0,
+      0,
+      23,
+      16,
+      4,
+      0,
+      2,
+      2,
+      1,
+      0,
+      0,
+      5,
+      1,
+      0,
+      0,
+      6,
+      0,
+      1,
+      9,
+      8,
+      15,
+      5,
+      11,
+      4,
+      0,
+      26,
+      12,
+      6,
+      4,
+      3,
+      2,
+      4,
+      1,
+      3,
+      2,
+      2,
+      6,
+      0,
+      0,
+      3,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      4,
+      0,
+      1,
+      3,
+      7,
+      4,
+      7,
+      4,
+      5
+    ],
+    "행신동 (고양시 덕양구)": [
+      2,
+      2,
+      1,
+      2,
+      0,
+      2,
+      0,
+      0,
+      2,
+      2,
+      0,
+      0,
+      6,
+      0,
+      0,
+      0,
+      4,
+      3,
+      0,
+      0,
+      0,
+      4,
+      1,
+      8,
+      5,
+      0,
+      3,
+      4,
+      5,
+      11,
+      4,
+      2,
+      1,
+      2,
+      2,
+      2,
+      9,
+      0,
+      0,
+      1,
+      3,
+      0,
+      1,
+      0,
+      6,
+      0,
+      0,
+      1,
+      3,
+      1,
+      4,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1
+    ]
+  },
+  "clusters_topN": [
+    {
+      "시군구": "고양시 덕양구",
+      "동": "도내동",
+      "일자": "201810-15",
+      "건수": 11,
+      "최다번지": "1**",
+      "번지건수": 11,
+      "지분비율": 55.0,
+      "지목": "전11"
+    },
+    {
+      "시군구": "고양시 덕양구",
+      "동": "동산동",
+      "일자": "201805-24",
+      "건수": 7,
+      "최다번지": "4*",
+      "번지건수": 7,
+      "지분비율": 57.0,
+      "지목": "임야3, 대2, 도로2"
+    },
+    {
+      "시군구": "고양시 덕양구",
+      "동": "행신동",
+      "일자": "201901-18",
+      "건수": 7,
+      "최다번지": "2**",
+      "번지건수": 7,
+      "지분비율": 100.0,
+      "지목": "대4, 전3"
+    },
+    {
+      "시군구": "고양시 덕양구",
+      "동": "용두동",
+      "일자": "201806-08",
+      "건수": 6,
+      "최다번지": "6**",
+      "번지건수": 4,
+      "지분비율": 17.0,
+      "지목": "도로3, 답2, 임야1"
+    },
+    {
+      "시군구": "고양시 덕양구",
+      "동": "화전동",
+      "일자": "201812-19",
+      "건수": 5,
+      "최다번지": "5**",
+      "번지건수": 3,
+      "지분비율": 0.0,
+      "지목": "철도용지4, 전1"
+    },
+    {
+      "시군구": "고양시 덕양구",
+      "동": "행신동",
+      "일자": "201806-25",
+      "건수": 5,
+      "최다번지": "3**",
+      "번지건수": 5,
+      "지분비율": 0.0,
+      "지목": "임야3, 도로1, 대1"
+    },
+    {
+      "시군구": "고양시 덕양구",
+      "동": "행신동",
+      "일자": "201806-15",
+      "건수": 5,
+      "최다번지": "1**",
+      "번지건수": 3,
+      "지분비율": 0.0,
+      "지목": "전3, 대1, 답1"
+    }
+  ],
+  "bunji_top": [
+    {
+      "시군구": "고양시 덕양구",
+      "동": "화전동",
+      "번지": "산6*",
+      "건수": 41
+    },
+    {
+      "시군구": "고양시 덕양구",
+      "동": "향동동",
+      "번지": "3**",
+      "건수": 32
+    },
+    {
+      "시군구": "고양시 덕양구",
+      "동": "용두동",
+      "번지": "4**",
+      "건수": 32
+    },
+    {
+      "시군구": "고양시 덕양구",
+      "동": "용두동",
+      "번지": "3**",
+      "건수": 25
+    },
+    {
+      "시군구": "고양시 덕양구",
+      "동": "동산동",
+      "번지": "6*",
+      "건수": 23
+    },
+    {
+      "시군구": "고양시 덕양구",
+      "동": "화전동",
+      "번지": "5**",
+      "건수": 21
+    },
+    {
+      "시군구": "부천시 오정구",
+      "동": "대장동",
+      "번지": "1**",
+      "건수": 18
+    },
+    {
+      "시군구": "부천시 오정구",
+      "동": "대장동",
+      "번지": "2**",
+      "건수": 16
+    },
+    {
+      "시군구": "고양시 덕양구",
+      "동": "행신동",
+      "번지": "2**",
+      "건수": 15
+    },
+    {
+      "시군구": "고양시 덕양구",
+      "동": "도내동",
+      "번지": "1**",
+      "건수": 15
+    },
+    {
+      "시군구": "부천시 오정구",
+      "동": "원종동",
+      "번지": "2**",
+      "건수": 14
+    },
+    {
+      "시군구": "고양시 덕양구",
+      "동": "동산동",
+      "번지": "5*",
+      "건수": 14
+    },
+    {
+      "시군구": "고양시 덕양구",
+      "동": "용두동",
+      "번지": "5**",
+      "건수": 14
+    },
+    {
+      "시군구": "고양시 덕양구",
+      "동": "화전동",
+      "번지": "1**",
+      "건수": 13
+    },
+    {
+      "시군구": "고양시 덕양구",
+      "동": "화전동",
+      "번지": "4**",
+      "건수": 13
+    }
+  ],
+  "kpi": {
+    "treatment_peak_mult": 0.68,
+    "control_peak_mult": 0.81,
+    "asymmetry": 0.85,
+    "treatment_post_drop": 0.42,
+    "top_dong_mult": {
+      "도내동 (고양시 덕양구)": 0.7,
+      "동산동 (고양시 덕양구)": 1.1,
+      "용두동 (고양시 덕양구)": 0.4,
+      "원흥동 (고양시 덕양구)": 0.4,
+      "행신동 (고양시 덕양구)": 2.0,
+      "향동동 (고양시 덕양구)": 0.9,
+      "화전동 (고양시 덕양구)": 1.4,
+      "대장동 (부천시 오정구)": 0.6,
+      "삼정동 (부천시 오정구)": 0.3,
+      "오정동 (부천시 오정구)": 0.4,
+      "원종동 (부천시 오정구)": 0.8
+    },
+    "districts": {
+      "고양창릉": {
+        "지구이름": "고양창릉",
+        "시군구": "고양시 덕양구",
+        "지구_평년": 51.2,
+        "지구_12m전": 37.4,
+        "통제_평년": 137.2,
+        "통제_12m전": 112.2,
+        "지구_배율": 0.73,
+        "통제_배율": 0.82,
+        "격차": 0.89
+      },
+      "부천대장": {
+        "지구이름": "부천대장",
+        "시군구": "부천시 오정구",
+        "지구_평년": 16.3,
+        "지구_12m전": 8.8,
+        "통제_평년": 9.7,
+        "통제_12m전": 6.8,
+        "지구_배율": 0.54,
+        "통제_배율": 0.71,
+        "격차": 0.77
+      }
+    },
+    "biggest_cluster": {
+      "시군구": "고양시 덕양구",
+      "동": "도내동",
+      "일자": "201810-15",
+      "건수": 11,
+      "최다번지": "1**",
+      "번지건수": 11,
+      "지분비율": 55.0,
+      "지목": "전11"
+    },
+    "top_bunji_concentration": {
+      "시군구": "고양시 덕양구",
+      "동": "화전동",
+      "번지": "산6*",
+      "건수": 41
+    },
+    "announcement_date": "2019-05-07"
+  }
+}</script>
+<script>
+const D = JSON.parse(document.getElementById('vizdata').textContent);
+const ANNO_X = "2019-05";
+const PEAK_START = "2018-05", PEAK_END = "2019-04";
+
+document.getElementById('kpi1').textContent = "×" + D.kpi.treatment_peak_mult;
+document.getElementById('kpi2').textContent = "×" + D.kpi.control_peak_mult;
+document.getElementById('kpi3').textContent = "×" + D.kpi.asymmetry + " 배";
+document.getElementById('kpi4').textContent = (D.kpi.treatment_post_drop * 100).toFixed(0) + "%";
+
+const annoAll = {
+  ann:{ type:'line', xMin:ANNO_X, xMax:ANNO_X, borderColor:'#e67e22', borderWidth:1.5, borderDash:[4,3],
+        label:{ display:true, content:'발표 2019-05-07', position:'start', color:'#e67e22', font:{size:11}, backgroundColor:'transparent' } },
+  band:{ type:'box', xMin:PEAK_START, xMax:PEAK_END, backgroundColor:'rgba(0,0,0,0.05)', borderWidth:0 }
+};
+
+const distTb = document.getElementById('districtTable');
+for (const dist of Object.values(D.kpi.districts)) {
+  const tr = document.createElement('tr');
+  const pill = dist["격차"] >= 1.2 ? 'hot' : (dist["격차"] >= 0.95 ? 'med' : 'muted');
+  tr.innerHTML = `<td>${dist["지구이름"]}</td><td>${dist["시군구"]}</td>`
+               + `<td class="num">${dist["지구_평년"]}</td><td class="num">${dist["지구_12m전"]}</td>`
+               + `<td class="num">×${dist["지구_배율"]}</td><td class="num">×${dist["통제_배율"]}</td>`
+               + `<td class="num"><span class="pill ${pill}">×${dist["격차"]}</span></td>`;
+  distTb.appendChild(tr);
+}
+
+new Chart(document.getElementById('mainChart'), {
+  type:'line',
+  data:{
+    labels:D.main.labels,
+    datasets:[
+      { label:'지구 (좌)', data:D.main.treatment, borderColor:'#e67e22', tension:0.2, yAxisID:'y', pointRadius:1, borderWidth:2 },
+      { label:'통제군 (우)', data:D.main.control, borderColor:'#888', tension:0.2, yAxisID:'y1', pointRadius:1, borderWidth:1.2 }
+    ]
+  },
+  options:{ responsive:true, interaction:{mode:'index', intersect:false},
+    scales:{ x:{ticks:{autoSkip:true,maxTicksLimit:14}}, y:{title:{display:true,text:'지구'},beginAtZero:true},
+      y1:{position:'right',title:{display:true,text:'통제군'},grid:{display:false},beginAtZero:true} },
+    plugins:{annotation:{annotations:annoAll}} }
+});
+
+const dongGrid = document.getElementById('dongGrid');
+const orderEntries = Object.entries(D.kpi.top_dong_mult).sort((a,b)=>b[1]-a[1]);
+for (const [k, mult] of orderEntries) {
+  if (!D.by_dong[k]) continue;
+  const wrap = document.createElement('div'); wrap.className = 'chart-wrap';
+  const cls = mult >= 1.5 ? 'pill hot' : (mult >= 1.0 ? 'pill med' : 'pill muted');
+  wrap.innerHTML = '<h3>' + k + ' <span class="' + cls + '">×' + mult + '</span></h3><canvas height="100"></canvas>';
+  dongGrid.appendChild(wrap);
+  new Chart(wrap.querySelector('canvas'), {
+    type:'line',
+    data:{ labels:D.main.labels, datasets:[{ data:D.by_dong[k], borderColor:'#e67e22', tension:0.25, pointRadius:0, borderWidth:1.6, fill:'origin', backgroundColor:'rgba(230,126,34,0.10)' }] },
+    options:{ responsive:true, plugins:{legend:{display:false},annotation:{annotations:annoAll}}, scales:{x:{ticks:{display:false}},y:{beginAtZero:true}} }
+  });
+}
+
+const ctb = document.querySelector('#clusterTable tbody');
+for (const c of D.clusters_topN) {
+  const tr = document.createElement('tr');
+  const shareColor = c['지분비율'] >= 50 ? '#a00' : (c['지분비율'] >= 20 ? '#a55' : '#666');
+  tr.innerHTML = '<td>'+c['시군구']+'</td><td>'+c['동']+'</td><td>'+c['일자']+'</td>'
+               + '<td class="num">'+c['건수']+'</td><td>'+c['최다번지']+'</td><td class="num">'+c['번지건수']+'</td>'
+               + '<td class="num" style="color:'+shareColor+'">'+c['지분비율']+'%</td>'
+               + '<td style="font-size:11px; color:#666">'+(c['지목']||'')+'</td>';
+  ctb.appendChild(tr);
+}
+const btb = document.querySelector('#bunjiTable tbody');
+for (const b of D.bunji_top) {
+  const tr = document.createElement('tr');
+  tr.innerHTML = '<td>'+b['시군구']+'</td><td>'+b['동']+'</td><td>'+b['번지']+'</td><td class="num">'+b['건수']+'</td>';
+  btb.appendChild(tr);
+}
+</script>
+
+</body>
+</html>
