@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>의심 클러스터 보드 — 5개 지구 통합 강신호</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+         max-width: 1200px; margin: 24px auto; padding: 0 16px; color: #1a1a1a; background:#fafafa; line-height:1.55; }
+  a { color:#0451a5; text-decoration:none; } a:hover { text-decoration:underline; }
+  h1 { font-size: 24px; margin-bottom: 4px; }
+  h2 { font-size: 17px; margin-top: 32px; border-left: 3px solid #b71c1c; padding-left: 8px; }
+  .sub { color:#666; font-size:13px; margin-bottom: 18px; }
+  .crumbs { font-size:12px; color:#888; margin-bottom:12px; }
+  .lead { background:#fff; border:1px solid #e3e3e3; border-radius:8px; padding:16px 18px; margin-bottom:22px; font-size:14px; }
+  .lead strong { color:#b71c1c; }
+  .kpi-row { display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; margin: 14px 0 22px; }
+  .kpi { background:#fff; border:1px solid #e3e3e3; border-radius:6px; padding:14px 16px; }
+  .kpi .v { font-size: 24px; font-weight: 700; color:#b71c1c; }
+  .kpi .l { font-size: 12px; color:#666; margin-top:3px; }
+  .chart-wrap { background:#fff; border:1px solid #e3e3e3; border-radius:6px; padding:16px; margin:14px 0; }
+  table { width:100%; border-collapse:collapse; font-size:13px; background:#fff; }
+  th, td { border-bottom:1px solid #eee; padding:7px 9px; text-align:left; vertical-align:top; }
+  th { background:#f3f3f3; font-weight:600; }
+  td.num { text-align:right; font-variant-numeric:tabular-nums; }
+  .grade { font-size:13px; letter-spacing:1px; color:#b71c1c; font-weight:600; }
+  .badge { display:inline-block; padding:2px 7px; border-radius:3px; font-size:11px; font-weight:600; }
+  .filter { margin: 14px 0 8px; }
+  .filter button { background:#fff; border:1px solid #d0d0d0; border-radius:4px; padding:5px 10px; font-size:12px; cursor:pointer; margin-right:4px; }
+  .filter button.on { background:#1a1a1a; color:#fff; border-color:#1a1a1a; }
+  .pill { display:inline-block; padding:1px 6px; border-radius:3px; font-size:11px; color:#fff; }
+  .note { font-size:12px; color:#666; margin-top:6px; line-height:1.5; }
+  .right-col { text-align:right; }
+</style>
+</head>
+<body>
+
+<div class="crumbs"><a href="../index.html">← 메인</a></div>
+<h1>의심 클러스터 보드</h1>
+<div class="sub">5개 신도시 지구의 토지 거래 데이터에서 추출한 강신호 우선순위 — 등기부 추적 후보</div>
+
+<div class="lead">
+  <strong>핵심 발견:</strong> 분석한 5개 지구(광명·시흥, 의왕·군포·안산, 1차 3기, 2차 3기, 2024 후보지) 모두에서 ★★★급 강신호가 발견됐다. 발표 전 12개월간 같은 임야 필지에 다수가 지분으로 분할 매수한 패턴은 광명·시흥만의 특이성이 아니다. 동 평균 지표가 약한 지구라도 단일 번지 단위로 들어가면 매집 정황이 잡힌다.
+  <strong style="color:#b71c1c">전체 1위는 1차 3기 하남시 초일동 산1*</strong> — 89건이 100% 지분으로 매수됐다. 광명·시흥 최대(옥길동 4** 54건)를 능가한다.
+</div>
+
+<h2>핵심 숫자</h2>
+<div class="kpi-row">
+  <div class="kpi"><div class="v" id="kpi1">—</div><div class="l">전체 의심 클러스터 (지분 ≥ 30%, 5건 이상)</div></div>
+  <div class="kpi"><div class="v" id="kpi2">—</div><div class="l">★★★ 등급 (100% 지분, 20건+)</div></div>
+  <div class="kpi"><div class="v" id="kpi3">—</div><div class="l">★★ 등급</div></div>
+  <div class="kpi"><div class="v" id="kpi4">—</div><div class="l">지구 수 (모두 강신호 보유)</div></div>
+</div>
+
+<h2>분포 — 지분 비율 × 건수</h2>
+<div class="chart-wrap">
+  <canvas id="scatter" height="120"></canvas>
+  <div class="note">오른쪽 위로 갈수록 강신호. 색상은 지구별. ★★★ 영역(지분 95%+ × 20건+)에 모든 지구의 점이 분포한다. 클릭하면 상세 페이지로 이동.</div>
+</div>
+
+<h2>우선순위 표 — 전체 (지구·등급별 필터)</h2>
+<div class="filter">
+  <button class="on" data-grade="all">전체</button>
+  <button data-grade="★★★">★★★만</button>
+  <button data-grade="★★">★★ 이상</button>
+</div>
+<div class="filter" id="districtFilter"></div>
+<div class="chart-wrap" style="padding:0; overflow:hidden">
+  <table id="suspectTable">
+    <thead>
+      <tr>
+        <th>등급</th><th>지구</th><th>위치</th><th class="num">건수</th><th class="num">지분</th><th>지목</th><th class="num">평균가(억)</th><th>메모</th><th>상세</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<h2>등기부 추적 가이드</h2>
+<div class="chart-wrap">
+  <p>각 클러스터의 정확한 매수자 신원과 분할 구조는 인터넷등기소(<a href="https://www.iros.go.kr">iros.go.kr</a>) 발급(1통 1,000원)으로 확인 가능. Top 우선순위와 발급 절차는 <code>registry/README.md</code>에 정리. 검증된 ★★★ 10곳을 발급하면 약 1만원으로 5개 지구의 매수자 구조가 한 번에 파악된다.</p>
+  <p style="font-size:12px; color:#666">한계: 국토부 실거래가의 번지는 마지막 자릿수가 *로 마스킹돼 있어, 정확한 번지는 등기부 검색에서 인접 분할(4-1, 4-2 …)을 차례로 확인해야 한다.</p>
+</div>
+
+<script id="vizdata" type="application/json">{
+  "suspects": [
+    {
+      "type": "bunji",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "하남시 초일동 산1*",
+      "건수": 89,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.25,
+      "메모": "폭증기 2018-01~2018-12 동일 번지 누적",
+      "등급": "★★★"
+    },
+    {
+      "type": "bunji",
+      "지구": "광명·시흥",
+      "발표": "2021-02-24",
+      "color": "#b71c1c",
+      "page": "pages/gwangmyeong-siheung.html",
+      "위치": "경기도 광명시 옥길동 4**",
+      "건수": 54,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.36,
+      "메모": "폭증기 2020-03~2020-08 동일 번지 누적",
+      "등급": "★★★"
+    },
+    {
+      "type": "bunji",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "하남시 하사창동 산3*",
+      "건수": 54,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.21,
+      "메모": "폭증기 2018-01~2018-12 동일 번지 누적",
+      "등급": "★★★"
+    },
+    {
+      "type": "bunji",
+      "지구": "2차 3기",
+      "발표": "2019-05-07",
+      "color": "#e67e22",
+      "page": "pages/2nd-batch-3rd-gen.html",
+      "위치": "고양시 덕양구 화전동 산6*",
+      "건수": 41,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.47,
+      "메모": "폭증기 2018-05~2019-04 동일 번지 누적",
+      "등급": "★★★"
+    },
+    {
+      "type": "bunji",
+      "지구": "광명·시흥",
+      "발표": "2021-02-24",
+      "color": "#b71c1c",
+      "page": "pages/gwangmyeong-siheung.html",
+      "위치": "경기도 시흥시 무지내동 산*",
+      "건수": 31,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.23,
+      "메모": "폭증기 2020-03~2020-08 동일 번지 누적",
+      "등급": "★★★"
+    },
+    {
+      "type": "bunji",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "하남시 하사창동 산1*",
+      "건수": 31,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.29,
+      "메모": "폭증기 2018-01~2018-12 동일 번지 누적",
+      "등급": "★★★"
+    },
+    {
+      "type": "bunji",
+      "지구": "의왕·군포·안산",
+      "발표": "2021-08-30",
+      "color": "#0a5",
+      "page": "pages/uiwang-gunpo-ansan.html",
+      "위치": "군포시 부곡동 산7*",
+      "건수": 31,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.22,
+      "메모": "폭증기 2020-09~2021-08 동일 번지 누적",
+      "등급": "★★★"
+    },
+    {
+      "type": "bunji",
+      "지구": "광명·시흥",
+      "발표": "2021-02-24",
+      "color": "#b71c1c",
+      "page": "pages/gwangmyeong-siheung.html",
+      "위치": "경기도 광명시 노온사동 산2**",
+      "건수": 29,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.47,
+      "메모": "폭증기 2020-03~2020-08 동일 번지 누적",
+      "등급": "★★★"
+    },
+    {
+      "type": "bunji",
+      "지구": "2024 후보지",
+      "발표": "2024-11-05",
+      "color": "#8e44ad",
+      "page": "pages/2024-candidates.html",
+      "위치": "서초구 내곡동 산1*",
+      "건수": 22,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.42,
+      "메모": "폭증기 2023-11~2024-10 동일 번지 누적",
+      "등급": "★★★"
+    },
+    {
+      "type": "bunji",
+      "지구": "광명·시흥",
+      "발표": "2021-02-24",
+      "color": "#b71c1c",
+      "page": "pages/gwangmyeong-siheung.html",
+      "위치": "경기도 시흥시 금이동 산1**",
+      "건수": 20,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.22,
+      "메모": "폭증기 2020-03~2020-08 동일 번지 누적",
+      "등급": "★★★"
+    },
+    {
+      "type": "cluster",
+      "지구": "광명·시흥",
+      "발표": "2021-02-24",
+      "color": "#b71c1c",
+      "page": "pages/gwangmyeong-siheung.html",
+      "위치": "경기도 시흥시 과림동 (산7*)",
+      "건수": 18,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.15,
+      "메모": "동일자 202007-03 클러스터",
+      "등급": "★★"
+    },
+    {
+      "type": "bunji",
+      "지구": "2024 후보지",
+      "발표": "2024-11-05",
+      "color": "#8e44ad",
+      "page": "pages/2024-candidates.html",
+      "위치": "고양시 덕양구 주교동 3**",
+      "건수": 18,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.1,
+      "메모": "폭증기 2023-11~2024-10 동일 번지 누적",
+      "등급": "★★"
+    },
+    {
+      "type": "cluster",
+      "지구": "광명·시흥",
+      "발표": "2021-02-24",
+      "color": "#b71c1c",
+      "page": "pages/gwangmyeong-siheung.html",
+      "위치": "경기도 광명시 옥길동 (4**)",
+      "건수": 17,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.23,
+      "메모": "동일자 202006-23 클러스터",
+      "등급": "★★"
+    },
+    {
+      "type": "cluster",
+      "지구": "광명·시흥",
+      "발표": "2021-02-24",
+      "color": "#b71c1c",
+      "page": "pages/gwangmyeong-siheung.html",
+      "위치": "경기도 광명시 가학동 (산9*)",
+      "건수": 17,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.25,
+      "메모": "동일자 202004-10 클러스터",
+      "등급": "★★"
+    },
+    {
+      "type": "cluster",
+      "지구": "광명·시흥",
+      "발표": "2021-02-24",
+      "color": "#b71c1c",
+      "page": "pages/gwangmyeong-siheung.html",
+      "위치": "경기도 광명시 가학동 (산9*)",
+      "건수": 17,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.16,
+      "메모": "동일자 202004-09 클러스터",
+      "등급": "★★"
+    },
+    {
+      "type": "cluster",
+      "지구": "광명·시흥",
+      "발표": "2021-02-24",
+      "color": "#b71c1c",
+      "page": "pages/gwangmyeong-siheung.html",
+      "위치": "경기도 광명시 옥길동 (4**)",
+      "건수": 16,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.2,
+      "메모": "동일자 202006-24 클러스터",
+      "등급": "★★"
+    },
+    {
+      "type": "cluster",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "하남시 천현동 (산1*)",
+      "건수": 14,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.26,
+      "메모": "동일자 201807-12 클러스터",
+      "등급": "★★"
+    },
+    {
+      "type": "cluster",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "하남시 하사창동 (3**)",
+      "건수": 14,
+      "지분비율": 100.0,
+      "주지목": "도로",
+      "평균가_억": 0.3,
+      "메모": "동일자 201802-14 클러스터",
+      "등급": "★★"
+    },
+    {
+      "type": "bunji",
+      "지구": "의왕·군포·안산",
+      "발표": "2021-08-30",
+      "color": "#0a5",
+      "page": "pages/uiwang-gunpo-ansan.html",
+      "위치": "안산시 상록구 사사동 산1*",
+      "건수": 14,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.23,
+      "메모": "폭증기 2020-09~2021-08 동일 번지 누적",
+      "등급": "★★"
+    },
+    {
+      "type": "cluster",
+      "지구": "광명·시흥",
+      "발표": "2021-02-24",
+      "color": "#b71c1c",
+      "page": "pages/gwangmyeong-siheung.html",
+      "위치": "경기도 시흥시 과림동 (산7*)",
+      "건수": 12,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.21,
+      "메모": "동일자 202007-02 클러스터",
+      "등급": "★★"
+    },
+    {
+      "type": "bunji",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "인천 계양구 귤현동 산4*",
+      "건수": 12,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.34,
+      "메모": "폭증기 2018-01~2018-12 동일 번지 누적",
+      "등급": "★★"
+    },
+    {
+      "type": "bunji",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "하남시 초이동 산*",
+      "건수": 12,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.34,
+      "메모": "폭증기 2018-01~2018-12 동일 번지 누적",
+      "등급": "★★"
+    },
+    {
+      "type": "cluster",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "하남시 상산곡동 (산2**)",
+      "건수": 12,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.16,
+      "메모": "동일자 201804-27 클러스터",
+      "등급": "★★"
+    },
+    {
+      "type": "cluster",
+      "지구": "광명·시흥",
+      "발표": "2021-02-24",
+      "color": "#b71c1c",
+      "page": "pages/gwangmyeong-siheung.html",
+      "위치": "경기도 광명시 노온사동 (4**)",
+      "건수": 11,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.72,
+      "메모": "동일자 202005-19 클러스터",
+      "등급": "★★"
+    },
+    {
+      "type": "cluster",
+      "지구": "광명·시흥",
+      "발표": "2021-02-24",
+      "color": "#b71c1c",
+      "page": "pages/gwangmyeong-siheung.html",
+      "위치": "경기도 시흥시 금이동 (4**)",
+      "건수": 11,
+      "지분비율": 100.0,
+      "주지목": "전",
+      "평균가_억": 0.16,
+      "메모": "동일자 202007-13 클러스터",
+      "등급": "★★"
+    },
+    {
+      "type": "bunji",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "하남시 상산곡동 산2*",
+      "건수": 11,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.12,
+      "메모": "폭증기 2018-01~2018-12 동일 번지 누적",
+      "등급": "★★"
+    },
+    {
+      "type": "cluster",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "남양주시 진접읍 (산9*)",
+      "건수": 11,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.19,
+      "메모": "동일자 201802-19 클러스터",
+      "등급": "★★"
+    },
+    {
+      "type": "cluster",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "하남시 상사창동 (산8*)",
+      "건수": 11,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.26,
+      "메모": "동일자 201812-21 클러스터",
+      "등급": "★★"
+    },
+    {
+      "type": "cluster",
+      "지구": "2024 후보지",
+      "발표": "2024-11-05",
+      "color": "#8e44ad",
+      "page": "pages/2024-candidates.html",
+      "위치": "고양시 덕양구 토당동 (3**)",
+      "건수": 11,
+      "지분비율": 100.0,
+      "주지목": "도로",
+      "평균가_억": 0.1,
+      "메모": "동일자 202404-03 클러스터",
+      "등급": "★★"
+    },
+    {
+      "type": "cluster",
+      "지구": "광명·시흥",
+      "발표": "2021-02-24",
+      "color": "#b71c1c",
+      "page": "pages/gwangmyeong-siheung.html",
+      "위치": "경기도 광명시 노온사동 (산2**)",
+      "건수": 10,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.23,
+      "메모": "동일자 202006-16 클러스터",
+      "등급": "★★"
+    },
+    {
+      "type": "cluster",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "인천 계양구 귤현동 (산4*)",
+      "건수": 10,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.38,
+      "메모": "동일자 201801-13 클러스터",
+      "등급": "★★"
+    },
+    {
+      "type": "cluster",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "남양주시 진접읍 (산2*)",
+      "건수": 10,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.26,
+      "메모": "동일자 201809-06 클러스터",
+      "등급": "★★"
+    },
+    {
+      "type": "cluster",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "하남시 천현동 (산1*)",
+      "건수": 10,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.28,
+      "메모": "동일자 201807-09 클러스터",
+      "등급": "★★"
+    },
+    {
+      "type": "cluster",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "하남시 천현동 (산1*)",
+      "건수": 10,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.36,
+      "메모": "동일자 201806-27 클러스터",
+      "등급": "★★"
+    },
+    {
+      "type": "bunji",
+      "지구": "2차 3기",
+      "발표": "2019-05-07",
+      "color": "#e67e22",
+      "page": "pages/2nd-batch-3rd-gen.html",
+      "위치": "고양시 덕양구 향동동 산7*",
+      "건수": 10,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.21,
+      "메모": "폭증기 2018-05~2019-04 동일 번지 누적",
+      "등급": "★★"
+    },
+    {
+      "type": "bunji",
+      "지구": "광명·시흥",
+      "발표": "2021-02-24",
+      "color": "#b71c1c",
+      "page": "pages/gwangmyeong-siheung.html",
+      "위치": "경기도 시흥시 금이동 산8*",
+      "건수": 9,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.11,
+      "메모": "폭증기 2020-03~2020-08 동일 번지 누적",
+      "등급": "★"
+    },
+    {
+      "type": "bunji",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "하남시 초이동 산3*",
+      "건수": 9,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.94,
+      "메모": "폭증기 2018-01~2018-12 동일 번지 누적",
+      "등급": "★"
+    },
+    {
+      "type": "cluster",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "남양주시 진접읍 (산9*)",
+      "건수": 9,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.08,
+      "메모": "동일자 201803-05 클러스터",
+      "등급": "★"
+    },
+    {
+      "type": "cluster",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "하남시 하사창동 (산3*)",
+      "건수": 9,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.17,
+      "메모": "동일자 201812-24 클러스터",
+      "등급": "★"
+    },
+    {
+      "type": "cluster",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "하남시 상산곡동 (산3**)",
+      "건수": 9,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.12,
+      "메모": "동일자 201810-17 클러스터",
+      "등급": "★"
+    },
+    {
+      "type": "cluster",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "하남시 광암동 (1**)",
+      "건수": 9,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.22,
+      "메모": "동일자 201807-20 클러스터",
+      "등급": "★"
+    },
+    {
+      "type": "cluster",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "하남시 상산곡동 (산3**)",
+      "건수": 9,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.23,
+      "메모": "동일자 201804-10 클러스터",
+      "등급": "★"
+    },
+    {
+      "type": "cluster",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "하남시 상산곡동 (6**)",
+      "건수": 9,
+      "지분비율": 100.0,
+      "주지목": "답",
+      "평균가_억": 0.37,
+      "메모": "동일자 201803-28 클러스터",
+      "등급": "★"
+    },
+    {
+      "type": "cluster",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "하남시 초일동 (산1*)",
+      "건수": 9,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.45,
+      "메모": "동일자 201801-22 클러스터",
+      "등급": "★"
+    },
+    {
+      "type": "bunji",
+      "지구": "2024 후보지",
+      "발표": "2024-11-05",
+      "color": "#8e44ad",
+      "page": "pages/2024-candidates.html",
+      "위치": "고양시 덕양구 대장동 2**",
+      "건수": 9,
+      "지분비율": 100.0,
+      "주지목": "도로",
+      "평균가_억": 0.13,
+      "메모": "폭증기 2023-11~2024-10 동일 번지 누적",
+      "등급": "★"
+    },
+    {
+      "type": "cluster",
+      "지구": "광명·시흥",
+      "발표": "2021-02-24",
+      "color": "#b71c1c",
+      "page": "pages/gwangmyeong-siheung.html",
+      "위치": "경기도 광명시 가학동 (산9*)",
+      "건수": 8,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.58,
+      "메모": "동일자 202007-02 클러스터",
+      "등급": "★"
+    },
+    {
+      "type": "bunji",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "하남시 상산곡동 산3*",
+      "건수": 8,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.11,
+      "메모": "폭증기 2018-01~2018-12 동일 번지 누적",
+      "등급": "★"
+    },
+    {
+      "type": "bunji",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "하남시 교산동 2**",
+      "건수": 8,
+      "지분비율": 100.0,
+      "주지목": "도로",
+      "평균가_억": 0.05,
+      "메모": "폭증기 2018-01~2018-12 동일 번지 누적",
+      "등급": "★"
+    },
+    {
+      "type": "cluster",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "남양주시 진접읍 (산9*)",
+      "건수": 8,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.11,
+      "메모": "동일자 201807-20 클러스터",
+      "등급": "★"
+    },
+    {
+      "type": "cluster",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "하남시 천현동 (산1*)",
+      "건수": 8,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.25,
+      "메모": "동일자 201806-21 클러스터",
+      "등급": "★"
+    },
+    {
+      "type": "cluster",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "하남시 상산곡동 (산2*)",
+      "건수": 8,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.23,
+      "메모": "동일자 201803-02 클러스터"
+    },
+    {
+      "type": "cluster",
+      "지구": "광명·시흥",
+      "발표": "2021-02-24",
+      "color": "#b71c1c",
+      "page": "pages/gwangmyeong-siheung.html",
+      "위치": "경기도 시흥시 무지내동 (1**)",
+      "건수": 7,
+      "지분비율": 100.0,
+      "주지목": "전",
+      "평균가_억": 6.57,
+      "메모": "동일자 202004-02 클러스터"
+    },
+    {
+      "type": "bunji",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "하남시 상사창동 산4*",
+      "건수": 7,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.31,
+      "메모": "폭증기 2018-01~2018-12 동일 번지 누적"
+    },
+    {
+      "type": "cluster",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "남양주시 진접읍 (1*)",
+      "건수": 7,
+      "지분비율": 100.0,
+      "주지목": "도로",
+      "평균가_억": 0.23,
+      "메모": "동일자 201812-10 클러스터"
+    },
+    {
+      "type": "cluster",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "남양주시 진건읍 (3**)",
+      "건수": 7,
+      "지분비율": 100.0,
+      "주지목": "답",
+      "평균가_억": 1.04,
+      "메모": "동일자 201803-19 클러스터"
+    },
+    {
+      "type": "cluster",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "하남시 상산곡동 (산3**)",
+      "건수": 7,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.16,
+      "메모": "동일자 201806-18 클러스터"
+    },
+    {
+      "type": "cluster",
+      "지구": "1차 3기",
+      "발표": "2018-12-19",
+      "color": "#1565c0",
+      "page": "pages/1st-batch-3rd-gen.html",
+      "위치": "하남시 상산곡동 (산3**)",
+      "건수": 7,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.11,
+      "메모": "동일자 201805-14 클러스터"
+    },
+    {
+      "type": "cluster",
+      "지구": "2차 3기",
+      "발표": "2019-05-07",
+      "color": "#e67e22",
+      "page": "pages/2nd-batch-3rd-gen.html",
+      "위치": "고양시 덕양구 행신동 (2**)",
+      "건수": 7,
+      "지분비율": 100.0,
+      "주지목": "대",
+      "평균가_억": 0.06,
+      "메모": "동일자 201901-18 클러스터"
+    },
+    {
+      "type": "cluster",
+      "지구": "광명·시흥",
+      "발표": "2021-02-24",
+      "color": "#b71c1c",
+      "page": "pages/gwangmyeong-siheung.html",
+      "위치": "경기도 광명시 노온사동 (4**)",
+      "건수": 6,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.14,
+      "메모": "동일자 202007-03 클러스터"
+    },
+    {
+      "type": "cluster",
+      "지구": "광명·시흥",
+      "발표": "2021-02-24",
+      "color": "#b71c1c",
+      "page": "pages/gwangmyeong-siheung.html",
+      "위치": "경기도 광명시 노온사동 (4**)",
+      "건수": 6,
+      "지분비율": 100.0,
+      "주지목": "임야",
+      "평균가_억": 0.34,
+      "메모": "동일자 202006-30 클러스터"
+    }
+  ]
+}</script>
+<script>
+const D = JSON.parse(document.getElementById('vizdata').textContent);
+const items = D.suspects;
+const grade3 = items.filter(s => s.등급 === "★★★").length;
+const grade2 = items.filter(s => s.등급 === "★★").length;
+const districts = [...new Set(items.map(s => s.지구))];
+
+document.getElementById('kpi1').textContent = items.length;
+document.getElementById('kpi2').textContent = grade3;
+document.getElementById('kpi3').textContent = grade2;
+document.getElementById('kpi4').textContent = districts.length;
+
+// Scatter
+const colors = {};
+items.forEach(s => colors[s.지구] = s.color);
+const datasets = districts.map(d => ({
+  label: d,
+  data: items.filter(s => s.지구 === d).map(s => ({x: s.지분비율, y: s.건수, _ref: s})),
+  backgroundColor: colors[d] + 'cc',
+  borderColor: colors[d],
+  pointRadius: 5, pointHoverRadius: 8
+}));
+new Chart(document.getElementById('scatter'), {
+  type:'scatter',
+  data:{ datasets },
+  options:{
+    responsive:true,
+    scales:{
+      x:{ title:{display:true, text:'지분 거래 비율 (%)'}, min:25, max:105 },
+      y:{ title:{display:true, text:'폭증기 누적 거래 수'}, beginAtZero:true }
+    },
+    plugins:{
+      tooltip:{ callbacks:{
+        label: (ctx) => {
+          const s = ctx.raw._ref;
+          return [`${s.지구} · ${s.위치}`, `${s.건수}건 · 지분 ${s.지분비율}% · ${s.주지목}`, s.메모];
+        }
+      }}
+    },
+    onClick:(evt, els) => {
+      if (!els.length) return;
+      const s = els[0].element.$context.raw._ref;
+      window.open(`../${s.page}`, '_blank');
+    }
+  }
+});
+
+// 지구 필터 버튼
+const dFilter = document.getElementById('districtFilter');
+const dBtnAll = document.createElement('button');
+dBtnAll.textContent = '전체 지구';
+dBtnAll.dataset.district = 'all';
+dBtnAll.classList.add('on');
+dFilter.appendChild(dBtnAll);
+districts.forEach(d => {
+  const b = document.createElement('button');
+  b.textContent = d;
+  b.dataset.district = d;
+  b.style.borderLeft = `3px solid ${colors[d]}`;
+  dFilter.appendChild(b);
+});
+
+let curGrade = 'all', curDist = 'all';
+function render() {
+  const tb = document.querySelector('#suspectTable tbody');
+  tb.innerHTML = '';
+  const passes = items.filter(s => {
+    if (curGrade === '★★★' && s.등급 !== '★★★') return false;
+    if (curGrade === '★★' && !['★★★','★★'].includes(s.등급)) return false;
+    if (curDist !== 'all' && s.지구 !== curDist) return false;
+    return true;
+  });
+  passes.forEach(s => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><span class="grade">${s.등급 || '·'}</span></td>`
+      + `<td><span class="pill" style="background:${s.color}">${s.지구}</span></td>`
+      + `<td>${s.위치}</td>`
+      + `<td class="num"><strong>${s.건수}</strong></td>`
+      + `<td class="num">${s.지분비율}%</td>`
+      + `<td>${s.주지목}</td>`
+      + `<td class="num">${s.평균가_억}</td>`
+      + `<td style="font-size:11px; color:#666">${s.메모}</td>`
+      + `<td><a href="../${s.page}">→</a></td>`;
+    tb.appendChild(tr);
+  });
+}
+render();
+
+document.querySelectorAll('.filter button[data-grade]').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.filter button[data-grade]').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    curGrade = b.dataset.grade; render();
+  });
+});
+document.querySelectorAll('.filter button[data-district]').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.filter button[data-district]').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    curDist = b.dataset.district; render();
+  });
+});
+</script>
+
+</body>
+</html>
