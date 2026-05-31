@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>케이스 스터디 — 하남시 초일동 산17-1</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+         max-width: 1100px; margin: 24px auto; padding: 0 18px; color:#1a1a1a; background:#fafafa; line-height:1.6; }
+  a { color:#0451a5; text-decoration:none; } a:hover { text-decoration:underline; }
+  h1 { font-size: 26px; margin: 0 0 4px; letter-spacing:-0.2px; }
+  h2 { font-size: 18px; margin: 36px 0 12px; border-left: 3px solid #b71c1c; padding-left: 10px; }
+  h3 { font-size: 15px; margin: 16px 0 6px; }
+  .sub { color:#666; font-size:13px; margin-bottom: 18px; }
+  .crumbs { font-size:12px; color:#888; margin-bottom:12px; }
+  .lead { background:#fff; border:1px solid #e3e3e3; border-radius:8px; padding:18px 22px; margin: 14px 0; font-size:14px; }
+  .lead strong.hot { color:#b71c1c; }
+  .kpi-row { display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; margin: 12px 0 24px; }
+  .kpi { background:#fff; border:1px solid #e3e3e3; border-radius:6px; padding:14px 16px; }
+  .kpi .v { font-size: 22px; font-weight: 700; color:#b71c1c; }
+  .kpi .l { font-size: 12px; color:#666; margin-top:3px; }
+  .chart-wrap { background:#fff; border:1px solid #e3e3e3; border-radius:6px; padding:18px; margin:12px 0; }
+  table { width:100%; border-collapse: collapse; font-size:13px; background:#fff; }
+  th, td { border-bottom: 1px solid #eee; padding:8px 10px; text-align:left; vertical-align:top; }
+  th { background:#f3f3f3; font-weight:600; }
+  td.num { text-align:right; font-variant-numeric: tabular-nums; }
+  .note { font-size:12px; color:#666; margin-top:8px; line-height:1.5; }
+  .pill { display:inline-block; padding:2px 8px; border-radius:3px; font-size:11px; font-weight:600; }
+  .pill.hot { background:#fee; color:#a00; }
+  .pill.med { background:#fef0e0; color:#a55; }
+  .pill.cool { background:#eaf2fb; color:#1565c0; }
+  blockquote { border-left:3px solid #d0d0d0; margin: 12px 0; padding: 4px 14px; color:#444; font-style: italic; background:#fbfbfb; }
+  .two-col { display:grid; grid-template-columns: 1fr 1fr; gap:14px; }
+  @media (max-width: 720px) { .two-col, .kpi-row { grid-template-columns: 1fr 1fr; } }
+  .timeline { list-style:none; padding-left:0; margin:0; }
+  .timeline li { padding:8px 12px; border-left:3px solid #ddd; margin-left:6px; position:relative; }
+  .timeline li.hot { border-color:#b71c1c; background:#fff5f5; }
+  .timeline li.med { border-color:#e67e22; background:#fff8e6; }
+  .timeline li b { color:#b71c1c; }
+</style>
+</head>
+<body>
+
+<div class="crumbs"><a href="../index.html">← 메인</a> · <a href="suspect-clusters.html">의심 클러스터 보드</a></div>
+<h1>케이스 스터디 — 하남시 초일동 산17-1</h1>
+<div class="sub">★★★ 1위 클러스터의 등기부·시계열·단가 통합 분석</div>
+
+<div class="lead">
+  <strong>요약:</strong> 1997년 한 개인이 매수한 12,180평 임야가 2008년부터 압류·가압류로 채무가 누적된 끝에 2017년 11월 임의경매로 매각됐다. 경매 회사들이 낙찰받자마자 <strong>80명의 개인에게 표준 단위로 분할 매도</strong>했고, 정확히 13개월 후 <strong>1차 3기 신도시(하남교산)가 발표</strong>됐다. 매수자들은 평당 약 29만원에 매수했고, 2년 후 시세는 <strong class="hot">평당 225만원 (약 8배)</strong>까지 올랐다.
+</div>
+
+<h2>핵심 숫자</h2>
+<div class="kpi-row">
+  <div class="kpi"><div class="v" id="k1">80</div><div class="l">분할 매수자 수 (등기 기준)</div></div>
+  <div class="kpi"><div class="v" id="k2">16.2억</div><div class="l">총 매수금액</div></div>
+  <div class="kpi"><div class="v" id="k3">×7.8</div><div class="l">매수가→2020년 시세 배율</div></div>
+  <div class="kpi"><div class="v" id="k4">12,180평</div><div class="l">필지 면적 (40,265㎡ 임야)</div></div>
+</div>
+
+<h2>1. 시계열 — 왜 경매에 갔는가</h2>
+<div class="chart-wrap">
+  <ul class="timeline">
+    <li><b>1997-11-29</b> 원소유자 <strong>이현만</strong>(370627-) 매수. 서울 송파구 문정동 거주. 12,180평 임야 취득</li>
+    <li>2004-05-27 송파구 문정동 150으로 거주지 변경 등기</li>
+    <li>2008-05-20 압류 등기 → 5월 26일 자진 해제</li>
+    <li>2009-07-02 하남시 압류 → 7월 3일 해제</li>
+    <li>2013-09-03 압류 말소</li>
+    <li>2015-02-02 가압류 말소 (이후 2년간 평온)</li>
+    <li class="med"><b>2017-01-09</b> 하남시 세무과 압류 (사건번호 2017000265, 제1165호) — 지방세 체납</li>
+    <li class="hot"><b>2017-11-22</b> <strong>임의경매 매각·소유권이전</strong>. 경매회사가 28,644/40,265 지분(약 71%) 우선 낙찰. 11번 압류 해제(제40150호)</li>
+    <li class="hot"><b>2017-12 ~ 2018-12</b> <strong>분할 매도 80건</strong>. 표준 단가(165㎡=1,445만원, 330㎡=2,890만원)로 메뉴화. 발표 12개월 전 4개월(2017-12 ~ 2018-03)에 55건 집중</li>
+    <li class="hot"><b>2018-12-19</b> <strong>1차 3기 신도시(하남교산) 발표</strong>. 초일동 포함 11개 동 지정</li>
+    <li>2019-2020 발표 직후 거래 동결</li>
+    <li class="med"><b>2020-05 ~ 2021-02</b> 재매도 폭증 (87건). 평당 시세 225만원 도달</li>
+  </ul>
+</div>
+
+<h2>2. ㎡당 단가 추이 — 2년 사이 8배 폭등</h2>
+<div class="chart-wrap">
+  <canvas id="priceChart" height="120"></canvas>
+  <div class="note">붉은 세로선: 1차 3기 신도시 발표일(2018-12-19). 회색 음영: 80명 분할 매수 집중기(2017-11 ~ 2018-08). 통제군: 하남시 다른 동의 산 번지 임야.</div>
+</div>
+
+<div class="two-col">
+  <div class="chart-wrap">
+    <h3>시기별 매매 단가 중앙값</h3>
+    <table>
+      <tr><th>시기</th><th class="num">㎡당</th><th class="num">평당</th><th>의미</th></tr>
+      <tr><td>2015-2017 평년</td><td class="num">40,224</td><td class="num">132,739</td><td>거래 거의 없음 (4건)</td></tr>
+      <tr><td><strong>2017-2018 매집기</strong></td><td class="num"><strong>87,422</strong></td><td class="num"><strong>288,494</strong></td><td>129건 분할 매수</td></tr>
+      <tr><td>발표 후 ~ 2019</td><td class="num">87,438</td><td class="num">288,545</td><td>거래 동결</td></tr>
+      <tr><td><strong>2020-05~2021-02</strong></td><td class="num"><strong>683,030</strong></td><td class="num"><strong>2,253,999</strong></td><td>87건 재매도, 8배 폭등</td></tr>
+      <tr><td>2022 이후</td><td class="num">994,381</td><td class="num">3,281,458</td><td>11배 도달</td></tr>
+    </table>
+  </div>
+  <div class="chart-wrap">
+    <h3>매수자 차익 시뮬레이션</h3>
+    <table>
+      <tr><th>구좌</th><th class="num">면적</th><th class="num">매수가</th><th class="num">2020 시세</th><th class="num">차익</th></tr>
+      <tr><td>1구좌</td><td class="num">165㎡(50평)</td><td class="num">1,445만원</td><td class="num">약 1.13억</td><td class="num"><strong>×7.8</strong></td></tr>
+      <tr><td>2구좌</td><td class="num">330㎡(100평)</td><td class="num">2,890만원</td><td class="num">약 2.25억</td><td class="num"><strong>×7.8</strong></td></tr>
+      <tr><td>4구좌</td><td class="num">661㎡(200평)</td><td class="num">5,780만원</td><td class="num">약 4.50억</td><td class="num"><strong>×7.8</strong></td></tr>
+      <tr><td colspan="2"><strong>80명 누적</strong></td><td class="num"><strong>16.2억원</strong></td><td class="num"><strong>약 130억원</strong></td><td class="num"><strong>약 114억 차익</strong></td></tr>
+    </table>
+    <div class="note">단, 매수자는 시장가보다 약 2배 비싸게 매수(사업자 마진). 실 차익은 시세차익에서 마진을 빼야 정확.</div>
+  </div>
+</div>
+
+<h2>3. 월별 거래 건수</h2>
+<div class="chart-wrap">
+  <canvas id="countChart" height="100"></canvas>
+  <div class="note">매집기(2017-12~2018-03) 폭증 → 발표 후 동결 → 2020-05~2021-02 재매도 폭증의 두 산 패턴.</div>
+</div>
+
+<h2>4. 매도자 — 단일 그룹 의심</h2>
+<div class="chart-wrap">
+  <p>OCR로 잡힌 매도자 그룹 (같은 회사가 이름을 여러 번 바꿈):</p>
+  <ul>
+    <li>주식회사<strong>우리경매</strong> · <strong>우리제일</strong>경매법인 · <strong>우리</strong>랜드옥션주식회사</li>
+    <li>주식회사<strong>케이비</strong>법원경매 · 천안<strong>케이비</strong>경매법인 (← 천안우리경매 2018-04 상호변경)</li>
+    <li>주식회사<strong>디에스</strong>경매 (← 대구케이비경매법인 2019-03 상호변경)</li>
+    <li>주식회사<strong>청구</strong>경매그룹</li>
+  </ul>
+  <p>이들은 갑구의 13번·14번·15번·17번 등기명의인으로 산17-1에 동시에 등재. <strong>단일 그룹이 다수 법인 명의로 분할 매도</strong> 의심.</p>
+</div>
+
+<h2>5. 페이스북 광고 — 같은 사업의 다른 케이스</h2>
+<div class="chart-wrap">
+  <p>매도자 그룹 중 <strong>우리제일경매</strong>가 2017-12-04 페이스북에 게재한 광고:</p>
+  <blockquote>
+    위치: 안산시 상록구 양상동 / 지목: 임야<br>
+    가격: 평당 145,000원<br>
+    50평 — 725만원 / <strong>100평 — 1,450만원</strong> / 150평 — 2,175만원 / <strong>200평 — 2,900만원</strong><br>
+    입지: 시흥 목감지구 620m, 안산IC 1.3km<br>
+    "현재 소사-원시선 완공되기전 지금이 타이밍입니다."
+  </blockquote>
+  <p>이 광고의 100평·200평 단가가 산17-1 등기부의 표준 단가(1,445만 / 2,890만)와 거의 정확히 일치. <strong>같은 회사가 신도시 후보지 인근(안산 양상동)에서도 같은 사업 모델을 운영</strong>한 증거.</p>
+</div>
+
+<h2>6. 의심 vs 우연 — 정직한 평가</h2>
+<div class="two-col">
+  <div class="chart-wrap">
+    <h3 style="color:#b71c1c">의심 (시스템적 매집)</h3>
+    <ul>
+      <li>발표 13개월 전 정확한 타이밍 매각</li>
+      <li>매각 즉시 분할 매도 시작 (사전 준비 시간 0)</li>
+      <li>표준 단위 메뉴화 (165㎡, 330㎡, 661㎡)</li>
+      <li>5개 신도시 지구 모두에서 같은 패턴</li>
+      <li>여러 회사가 단일 그룹화 (상호 변경)</li>
+    </ul>
+  </div>
+  <div class="chart-wrap">
+    <h3 style="color:#1565c0">우연 (합법 기획부동산)</h3>
+    <ul>
+      <li>기획부동산은 한국에서 흔한 합법 사업</li>
+      <li>경매·분할매도는 정상적 부동산 비즈니스</li>
+      <li>페북 공개 광고로 비밀거래 아님</li>
+      <li>매수자 입장에서 결과적 차익은 "운"</li>
+      <li>매도자가 정보 누설을 받았다는 직접 증거는 없음</li>
+    </ul>
+  </div>
+</div>
+
+<div class="lead" style="background:#fff8e6; border-color:#f5e4a8;">
+  <strong>현 단계 판단:</strong> 의심 패턴은 명확하나 위법 단정은 시기상조. <strong class="hot">매수자 80명 중 공직자·LH·지자체 인사가 매칭</strong>되거나, <strong class="hot">우리제일경매의 다른 광고에서 모든 신도시 후보지가 등장</strong>하면 단순 시장 정보 우위 가설이 깨진다. 지금은 <strong>"이런 사업이 발표 직전마다 반복된 사실 자체가 신도시 정보 통제의 빈틈을 보여준다"</strong>는 톤이 안전.
+</div>
+
+<h2>7. 다음 검증 단계</h2>
+<div class="chart-wrap">
+  <ol>
+    <li><strong>매수자 80명 명단 정제</strong> — 현재 OCR로 일부만 인식. 직접 PDF 페이지별 확인 또는 AI OCR로 완전 명단 확보.</li>
+    <li><strong>공직자·LH 명단 교차</strong> — 80명 중 공직자 재산공개·LH 임직원·국토부 출신이 있는지.</li>
+    <li><strong>우리제일경매 페이스북 전체 광고 시계열</strong> — 광고 위치가 모두 신도시 후보지였는지 vs 후보지 아닌 일반 광고도 있었는지.</li>
+    <li><strong>광명·시흥 옥길동 4** 등기부</strong> — 매도자가 우리제일경매 그룹이면 단일 시리즈 확정.</li>
+    <li><strong>국세청 사업자 조회</strong> — 우리제일경매·우리경매·KB법원경매·디에스경매가 같은 사주인지 확인.</li>
+    <li><strong>법원경매정보(courtauction.go.kr)</strong> — 2017년 산17-1 임의경매 사건의 감정평가액·낙찰가·낙찰자 확인. 낙찰가와 분할 매도가 합계의 차이가 사업자 마진.</li>
+  </ol>
+</div>
+
+<h2>데이터·근거</h2>
+<div class="chart-wrap">
+  <table>
+    <tr><th>항목</th><th>출처</th></tr>
+    <tr><td>국토부 실거래가 토지 매매</td><td>rt.molit.go.kr (시군구·연도별 CSV 다운로드)</td></tr>
+    <tr><td>등기사항증명서(부동산) PDF</td><td>iros.go.kr (1통 1,000원)</td></tr>
+    <tr><td>광고 캡처</td><td>우리제일경매 페이스북 페이지 2017-12-04</td></tr>
+    <tr><td>1차 3기 신도시 발표 정보</td><td>국토교통부 보도자료 2018-12-19</td></tr>
+    <tr><td>분석 파일</td><td><code>registry/sancho17-1_buyers.csv</code>, <code>registry/sancho17-1_history.csv</code>, <code>data/parsed/case_sancho17.json</code></td></tr>
+  </table>
+</div>
+
+<script id="vizdata" type="application/json">{
+  "labels": [
+    "2015-01",
+    "2015-02",
+    "2015-03",
+    "2015-04",
+    "2015-05",
+    "2015-06",
+    "2015-07",
+    "2015-08",
+    "2015-09",
+    "2015-10",
+    "2015-11",
+    "2015-12",
+    "2016-01",
+    "2016-02",
+    "2016-03",
+    "2016-04",
+    "2016-05",
+    "2016-06",
+    "2016-07",
+    "2016-08",
+    "2016-09",
+    "2016-10",
+    "2016-11",
+    "2016-12",
+    "2017-01",
+    "2017-02",
+    "2017-03",
+    "2017-04",
+    "2017-05",
+    "2017-06",
+    "2017-07",
+    "2017-08",
+    "2017-09",
+    "2017-10",
+    "2017-11",
+    "2017-12",
+    "2018-01",
+    "2018-02",
+    "2018-03",
+    "2018-04",
+    "2018-05",
+    "2018-06",
+    "2018-07",
+    "2018-08",
+    "2018-09",
+    "2018-10",
+    "2018-11",
+    "2018-12",
+    "2019-01",
+    "2019-02",
+    "2019-03",
+    "2019-04",
+    "2019-05",
+    "2019-06",
+    "2019-07",
+    "2019-08",
+    "2019-09",
+    "2019-10",
+    "2019-11",
+    "2019-12",
+    "2020-01",
+    "2020-02",
+    "2020-03",
+    "2020-04",
+    "2020-05",
+    "2020-06",
+    "2020-07",
+    "2020-08",
+    "2020-09",
+    "2020-10",
+    "2020-11",
+    "2020-12",
+    "2021-01",
+    "2021-02",
+    "2021-03",
+    "2021-04",
+    "2021-05",
+    "2021-06",
+    "2021-07",
+    "2021-08",
+    "2021-09",
+    "2021-10",
+    "2021-11",
+    "2021-12",
+    "2022-01",
+    "2022-02",
+    "2022-03",
+    "2022-04",
+    "2022-05",
+    "2022-06",
+    "2022-07",
+    "2022-08",
+    "2022-09",
+    "2022-10",
+    "2022-11",
+    "2022-12"
+  ],
+  "산17_단가": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    26137,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    411151,
+    0,
+    0,
+    40224,
+    0,
+    0,
+    0,
+    25998,
+    87422,
+    87423,
+    87424,
+    87427,
+    87430,
+    87422,
+    87576,
+    87423,
+    87422,
+    87422,
+    87423,
+    87417,
+    0,
+    87460,
+    0,
+    87576,
+    0,
+    87417,
+    0,
+    30209,
+    0,
+    0,
+    0,
+    87576,
+    0,
+    0,
+    91842,
+    0,
+    26675,
+    117406,
+    75684,
+    287100,
+    287072,
+    0,
+    287172,
+    290000,
+    190178,
+    683030,
+    696970,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1944762,
+    0,
+    1944762,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    44000
+  ],
+  "통제_단가": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    166364,
+    177943,
+    174359,
+    162199,
+    151404,
+    147030,
+    167278,
+    148036,
+    45409,
+    98039,
+    52870,
+    51317,
+    50056,
+    46970,
+    46970,
+    107909,
+    37879,
+    37818,
+    35643,
+    35697,
+    38055,
+    43333,
+    132000,
+    119697,
+    155697,
+    57186,
+    54242,
+    59091,
+    51212,
+    51212,
+    51090,
+    23939,
+    51286,
+    54242,
+    54242,
+    50864,
+    57273,
+    57273,
+    148200,
+    59091,
+    58992,
+    58485,
+    105870,
+    105714,
+    222727,
+    405051,
+    311818,
+    316270,
+    590099,
+    623636,
+    415849,
+    500000,
+    417303,
+    813672,
+    825771,
+    19826,
+    362976,
+    362955,
+    843920,
+    846001,
+    843835,
+    950303,
+    29586,
+    90750,
+    33207,
+    127528,
+    48411,
+    196805,
+    42554,
+    67298,
+    604230,
+    906977,
+    32432,
+    861212,
+    302070,
+    742424,
+    757576,
+    56326,
+    345781,
+    738712,
+    389202,
+    79293,
+    168702,
+    180832
+  ],
+  "산17_거래수": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    2,
+    0,
+    0,
+    0,
+    15,
+    27,
+    40,
+    20,
+    9,
+    5,
+    8,
+    1,
+    3,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    0,
+    1,
+    0,
+    1,
+    0,
+    2,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    6,
+    0,
+    1,
+    10,
+    1,
+    4,
+    6,
+    0,
+    2,
+    1,
+    2,
+    35,
+    26,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    3,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    4
+  ],
+  "통제_거래수": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    65,
+    44,
+    57,
+    59,
+    43,
+    42,
+    32,
+    28,
+    23,
+    43,
+    86,
+    160,
+    114,
+    72,
+    49,
+    40,
+    41,
+    88,
+    69,
+    93,
+    113,
+    143,
+    104,
+    89,
+    82,
+    53,
+    112,
+    117,
+    120,
+    203,
+    166,
+    95,
+    52,
+    69,
+    60,
+    142,
+    46,
+    27,
+    18,
+    49,
+    60,
+    23,
+    19,
+    34,
+    37,
+    123,
+    156,
+    66,
+    78,
+    96,
+    149,
+    55,
+    62,
+    161,
+    46,
+    15,
+    17,
+    11,
+    19,
+    58,
+    14,
+    87,
+    14,
+    7,
+    2,
+    8,
+    5,
+    12,
+    4,
+    1,
+    1,
+    5,
+    7,
+    38,
+    9,
+    19,
+    70,
+    6,
+    5,
+    20,
+    2,
+    4,
+    1,
+    3
+  ],
+  "kpi": {
+    "필지": "하남시 초일동 산17-1 (등기부 발급 결과)",
+    "면적_m2": 40265,
+    "면적_평": 12202.0,
+    "매수자_수": 80,
+    "단가_평년": 40224,
+    "단가_매집기": 87422,
+    "단가_2020후반": 683030,
+    "단가_최근": 994382,
+    "매수자_8배차익": 7.8,
+    "사업자_마진_추정": 2.2,
+    "총매수금": "16억 2천만원",
+    "추정시세": "약 130억원",
+    "발표일": "2018-12-19",
+    "임의경매": "2017-11-22",
+    "압류": "2017-01-09 (하남시 세무과 2017000265)",
+    "원소유자": "이현만 (1997-11-29 매수)"
+  }
+}</script>
+<script>
+const D = JSON.parse(document.getElementById('vizdata').textContent);
+const K = D.kpi;
+document.getElementById('k1').textContent = K.매수자_수 + '명';
+document.getElementById('k2').textContent = K.총매수금;
+document.getElementById('k3').textContent = '×' + K.매수자_8배차익;
+document.getElementById('k4').textContent = K.면적_평.toLocaleString() + '평';
+
+const annoCommon = {
+  ann: { type:'line', xMin:'2018-12', xMax:'2018-12', borderColor:'#b71c1c', borderWidth:1.5, borderDash:[4,3],
+         label:{ display:true, content:'발표 2018-12-19', position:'start', color:'#b71c1c', font:{size:11}, backgroundColor:'transparent' } },
+  band: { type:'box', xMin:'2017-11', xMax:'2018-08', backgroundColor:'rgba(0,0,0,0.05)', borderWidth:0 }
+};
+
+// 1) 단가 시계열 (null로 처리하여 거래 없는 월은 끊김)
+const priceTreat = D.산17_단가.map(v => v > 0 ? v : null);
+const priceCtrl = D.통제_단가.map(v => v > 0 ? v : null);
+new Chart(document.getElementById('priceChart'), {
+  type:'line',
+  data:{
+    labels: D.labels,
+    datasets:[
+      { label:'산17-1 (초일동 산)', data: priceTreat, borderColor:'#b71c1c', backgroundColor:'rgba(183,28,28,0.2)',
+        tension:0.2, pointRadius:3, borderWidth:2, spanGaps:true, fill:false },
+      { label:'하남시 다른 동 산 (통제군)', data: priceCtrl, borderColor:'#888', backgroundColor:'rgba(136,136,136,0.1)',
+        tension:0.2, pointRadius:0, borderWidth:1.3, spanGaps:true }
+    ]
+  },
+  options:{
+    responsive:true, interaction:{mode:'index', intersect:false},
+    scales:{
+      x:{ ticks:{ autoSkip:true, maxTicksLimit:14 }},
+      y:{ title:{display:true, text:'㎡당 단가 (원)'}, beginAtZero:true,
+          ticks:{ callback: v => v.toLocaleString() } }
+    },
+    plugins:{ annotation:{annotations:annoCommon} }
+  }
+});
+
+// 2) 월별 거래 건수
+new Chart(document.getElementById('countChart'), {
+  type:'bar',
+  data:{
+    labels: D.labels,
+    datasets:[{ label:'산17-1 거래 건수', data: D.산17_거래수, backgroundColor:'#b71c1c' }]
+  },
+  options:{
+    responsive:true,
+    scales:{
+      x:{ ticks:{ autoSkip:true, maxTicksLimit:14 }},
+      y:{ beginAtZero:true, title:{display:true, text:'거래 건수'} }
+    },
+    plugins:{ legend:{display:false}, annotation:{annotations:annoCommon} }
+  }
+});
+</script>
+
+</body>
+</html>
